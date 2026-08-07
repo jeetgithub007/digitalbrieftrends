@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="apple-touch-icon" href="/static/favicon.svg">
+<meta name="theme-color" content="#0f0f12">
+
+<title>DigitalBrief — Trend Pipeline Dashboard</title>
+<style>
+  :root {
+    --bg: #0f0f12;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2a2a38;
+    --text: #e8e8ed;
+    --text2: #9090a8;
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --red: #e74c3c;
+    --green: #2ecc71;
+    --orange: #f39c12;
+    --blue: #3498db;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Layout */
+  .app { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+    flex-wrap: wrap; gap: 16px;
+  }
+  .header h1 { font-size: 1.6rem; font-weight: 700; }
+  .header h1 span { color: var(--accent2); }
+  .header-stats {
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .stat {
+    text-align: center;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+  }
+  .stat-value { font-size: 1.4rem; font-weight: 700; color: var(--accent2); }
+  .stat-label { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Controls */
+  .controls {
+    display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn {
+    padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); cursor: pointer;
+    font-size: 0.85rem; transition: all 0.2s;
+  }
+  .btn:hover { background: var(--surface2); border-color: var(--accent); }
+  .btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-refresh { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  select {
+    padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .score-slider {
+    display: flex; align-items: center; gap: 8px; margin-left: auto;
+  }
+  .score-slider label { font-size: 0.8rem; color: var(--text2); }
+  .score-slider input { width: 100px; accent-color: var(--accent); }
+
+  /* Status bar */
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; background: var(--surface); border-radius: var(--radius);
+    margin-bottom: 20px; border: 1px solid var(--border);
+    font-size: 0.8rem; flex-wrap: wrap;
+  }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-dot.ok { background: var(--green); }
+  .status-dot.warn { background: var(--orange); }
+  .status-dot.err { background: var(--red); }
+  .status-text { color: var(--text2); }
+
+  /* Trend cards */
+  .trends-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 14px;
+  }
+  .trend-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .trend-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .trend-rank {
+    display: inline-block;
+    width: 28px; height: 28px; line-height: 28px;
+    text-align: center; border-radius: 6px;
+    font-size: 0.75rem; font-weight: 700;
+    background: var(--surface2);
+    margin-right: 8px;
+  }
+  .trend-rank.top { background: var(--accent); color: #fff; }
+  .trend-title {
+    font-size: 0.95rem; font-weight: 600; line-height: 1.4;
+    margin-bottom: 10px;
+  }
+  .trend-title a { color: inherit; text-decoration: none; }
+  .trend-title a:hover { color: var(--accent2); }
+
+  .trend-meta {
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+    font-size: 0.75rem; color: var(--text2);
+  }
+  .trend-score {
+    font-weight: 700; color: var(--accent2);
+    font-size: 0.85rem;
+  }
+  .source-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 0.68rem; font-weight: 600;
+  }
+  .source-badge.google_trends { background: #4285f420; color: #4285f4; }
+  .source-badge.newsapi { background: #e74c3c20; color: #e74c3c; }
+  .source-badge.mediastack { background: #3498db20; color: #3498db; }
+  .source-badge.gnews { background: #ea433520; color: #ea4335; }
+  .source-badge.currents { background: #9b59b620; color: #9b59b6; }
+  .source-badge.reddit { background: #ff450020; color: #ff4500; }
+  .source-badge.rss { background: #f39c1220; color: #f39c12; }
+
+  .trend-description {
+    font-size: 0.78rem; color: var(--text2); line-height: 1.5;
+    margin-top: 8px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Content Ideas section */
+  .section-title {
+    font-size: 1.1rem; font-weight: 700; margin: 28px 0 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ideas-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+  }
+  .idea-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; transition: all 0.2s;
+  }
+  .idea-card:hover { border-color: var(--green); }
+  .idea-category {
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    color: var(--accent2); margin-bottom: 6px;
+  }
+  .idea-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+  .idea-angles {
+    list-style: none; font-size: 0.75rem; color: var(--text2);
+  }
+  .idea-angles li { padding: 3px 0; }
+  .idea-angles li::before { content: "→ "; color: var(--accent2); }
+  .idea-score { font-size: 0.75rem; color: var(--green); margin-top: 8px; }
+
+  /* Empty & Error states */
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: var(--text2);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
+  .empty-state p { font-size: 0.85rem; max-width: 400px; margin: 0 auto; }
+
+  .error-banner {
+    background: var(--red); color: #fff; padding: 12px 16px;
+    border-radius: var(--radius); margin-bottom: 16px;
+    font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+  }
+
+  .loading-pulse {
+    display: inline-block; width: 100%; height: 120px;
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+    background-size: 200% 100%;
+    animation: pulse 1.5s infinite;
+    border-radius: var(--radius);
+  }
+  @keyframes pulse { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .app { padding: 12px; }
+    .header h1 { font-size: 1.2rem; }
+    .trends-grid { grid-template-columns: 1fr; }
+    .ideas-grid { grid-template-columns: 1fr; }
+    .controls { flex-direction: column; align-items: stretch; }
+    .score-slider { margin-left: 0; }
+    .header-stats { gap: 8px; }
+    .stat { padding: 8px 12px; }
+    .stat-value { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1><a href="/" style="color:inherit;text-decoration:none;font-size:.75rem;opacity:.6;margin-right:12px;">← Home</a>📈 DigitalBrief <span>Trend Pipeline</span></h1>
+    <div class="header-stats" id="headerStats">
+      <div class="stat"><div class="stat-value">-</div><div class="stat-label">Total Trends</div></div>
+      <div class="stat"><div class="stat-value">-</div><div class="stat-label">Sources</div></div>
+      <div class="stat"><div class="stat-value">-</div><div class="stat-label">Content Ideas</div></div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar" id="statusBar">
+    <span class="status-dot warn" id="statusDot"></span>
+    <span id="statusText">Loading pipeline data…</span>
+    <span style="margin-left: auto; color: var(--text2);" id="refreshInfo"></span>
+  </div>
+
+  <!-- Error Banner (hidden by default) -->
+  <div class="error-banner" id="errorBanner" style="display:none;"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn active" data-source="all" onclick="filterSourceAll()">All (7)</button>
+    <button class="btn" data-source="google_trends" onclick="filterSource('google_trends')">Google</button>
+    <button class="btn" data-source="mediastack" onclick="filterSource('mediastack')">Mediastack</button>
+    <button class="btn" data-source="gnews" onclick="filterSource('gnews')">GNews</button>
+    <button class="btn" data-source="currents" onclick="filterSource('currents')">Currents</button>
+    <button class="btn" data-source="newsapi" onclick="filterSource('newsapi')">NewsAPI</button>
+    <button class="btn" data-source="reddit" onclick="filterSource('reddit')">Reddit</button>
+    <button class="btn" data-source="rss" onclick="filterSource('rss')">RSS</button>
+    <div class="score-slider">
+      <label for="minScore">Min Score:</label>
+      <input type="range" id="minScore" min="0" max="100" value="0" oninput="filterByScore(this.value)">
+      <span id="scoreValue" style="font-weight:700;color:var(--accent2);min-width:3ch">0</span>
+    </div>
+    <button class="btn btn-refresh" onclick="forceRefresh()" id="refreshBtn">🔄 Refresh</button>
+  </div>
+
+  <!-- Trends Grid -->
+  <div class="section-title">🔥 Trending Now <span style="font-size:0.75rem;color:var(--text2);font-weight:400" id="trendCount"></span></div>
+  <div class="trends-grid" id="trendsGrid">
+    <div class="loading-pulse"></div>
+    <div class="loading-pulse"></div>
+    <div class="loading-pulse"></div>
+    <div class="loading-pulse"></div>
+  </div>
+
+  <!-- Content Ideas -->
+  <div class="section-title">💡 Content Ideas <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(high-score topics)</span></div>
+  <div class="ideas-grid" id="ideasGrid">
+    <div class="loading-pulse"></div>
+    <div class="loading-pulse"></div>
+  </div>
+
+  <!-- Empty state for ideas (hidden by default) -->
+  <div class="empty-state" id="ideasEmpty" style="display:none;">
+    <div class="icon">💡</div>
+    <h3>No content ideas yet</h3>
+    <p>Content ideas appear when trends score above the minimum threshold. Adjust the score slider or wait for the next refresh.</p>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let allTrends = [];
+let ideas = [];
+let currentSource = 'all';
+let currentMinScore = 0;
+
+// ── API ──
+async function fetchData() {
+  try {
+    const [trendsRes, ideasRes, statusRes] = await Promise.all([
+      fetch('/api/trends?limit=60'),
+      fetch('/api/trends/ideas?min_score=40'),
+      fetch('/api/trends/status')
+    ]);
+    const trendsData = await trendsRes.json();
+    const ideasData = await ideasRes.json();
+    const statusData = await statusRes.json();
+
+    allTrends = trendsData.data || [];
+    ideas = ideasData.data || [];
+
+    updateUI(trendsData, statusData);
+    hideError();
+  } catch (e) {
+    showError('Cannot connect to pipeline server. Is it running?');
+  }
+}
+
+// ── UI Update ──
+function updateUI(trendsData, statusData) {
+  // Header stats
+  const sourceSet = new Set();
+  allTrends.forEach(t => (t.sources || [t.source] || []).forEach(s => sourceSet.add(s)));
+
+  document.getElementById('headerStats').innerHTML = `
+    <div class="stat"><div class="stat-value">${allTrends.length}</div><div class="stat-label">Total Trends</div></div>
+    <div class="stat"><div class="stat-value">${sourceSet.size}</div><div class="stat-label">Sources</div></div>
+    <div class="stat"><div class="stat-value">${ideas.length}</div><div class="stat-label">Content Ideas</div></div>
+  `;
+
+  // Status bar
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const refreshInfo = document.getElementById('refreshInfo');
+
+  if (statusData.data_available) {
+    statusDot.className = 'status-dot ok';
+    statusText.textContent = `Last refreshed: ${statusData.last_updated || 'unknown'} (${statusData.age_seconds}s ago)`;
+    refreshInfo.textContent = `${statusData.refresh_count} refreshes | Next in ~${30 - (statusData.age_seconds % (30*60))/60 | 0}m`;
+  } else {
+    statusDot.className = 'status-dot warn';
+    statusText.textContent = 'Waiting for first data fetch…';
+    refreshInfo.textContent = '';
+  }
+
+  // Errors
+  if (statusData.recent_errors && statusData.recent_errors.length > 0) {
+    const lastErr = statusData.recent_errors[statusData.recent_errors.length - 1];
+    showError(`Recent error: ${lastErr.error}`);
+  }
+
+  renderTrends();
+  renderIdeas();
+}
+
+// ── Render Trends ──
+function renderTrends() {
+  const grid = document.getElementById('trendsGrid');
+  const countEl = document.getElementById('trendCount');
+
+  let filtered = allTrends;
+  if (currentSource !== 'all') {
+    filtered = filtered.filter(t => (t.sources || []).includes(currentSource));
+  }
+  filtered = filtered.filter(t => t.trend_score >= currentMinScore);
+  filtered = filtered.slice(0, 60);
+
+  countEl.textContent = `(${filtered.length} items)`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="icon">🔍</div>
+        <h3>No trends match your filters</h3>
+        <p>Try lowering the minimum score or selecting a different source.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    const sources = (t.sources || [t.source || '']).filter(Boolean);
+    const badgeHtml = sources.map(s => 
+      `<span class="source-badge ${s}">${s.replace('_',' ')}</span>`
+    ).join('');
+
+    return `
+      <div class="trend-card">
+        <span class="trend-rank ${t.rank <= 3 ? 'top' : ''}">#${t.rank}</span>
+        <span class="trend-score">${t.trend_score}</span>
+        <div class="trend-title">
+          ${t.url ? `<a href="${t.url}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a>` : escapeHtml(t.title)}
+        </div>
+        <div class="trend-meta">
+          ${badgeHtml}
+          ${t.subreddit ? `<span>r/${t.subreddit}</span>` : ''}
+          ${t.published_at ? `<span>${formatDate(t.published_at)}</span>` : ''}
+        </div>
+        ${t.description ? `<div class="trend-description">${escapeHtml(t.description)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ── Render Content Ideas ──
+function renderIdeas() {
+  const grid = document.getElementById('ideasGrid');
+  const emptyState = document.getElementById('ideasEmpty');
+
+  let filtered = ideas.filter(i => i.score >= currentMinScore);
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    emptyState.style.display = 'block';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  grid.innerHTML = filtered.slice(0, 20).map(i => `
+    <div class="idea-card">
+      <div class="idea-category">${i.category || 'Technology'}</div>
+      <div class="idea-title">${escapeHtml(i.title)}</div>
+      <ul class="idea-angles">
+        ${(i.angle_suggestions || []).map(a => `<li>${escapeHtml(a)}</li>`).join('')}
+      </ul>
+      <div class="idea-score">Score: ${i.score} | Sources: ${(i.sources || []).join(', ')}</div>
+    </div>
+  `).join('');
+}
+
+// ── Filters ──
+function filterSource(source) {
+  currentSource = source;
+  document.querySelectorAll('.controls .btn[data-source]').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.btn[data-source="${source}"]`).classList.add('active');
+  renderTrends();
+  renderIdeas();
+}
+
+function filterSourceAll() {
+  currentSource = 'all';
+  document.querySelectorAll('.controls .btn[data-source]').forEach(b => b.classList.remove('active'));
+  document.querySelector('.btn[data-source="all"]').classList.add('active');
+  renderTrends();
+  renderIdeas();
+}
+
+function filterByScore(val) {
+  currentMinScore = parseInt(val);
+  document.getElementById('scoreValue').textContent = val;
+  renderTrends();
+}
+
+// ── Actions ──
+async function forceRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Refreshing…';
+  try {
+    await fetch('/api/trends/refresh');
+    await fetchData();
+  } catch (e) {
+    showError('Refresh failed. Check server logs.');
+  }
+  btn.disabled = false;
+  btn.textContent = '🔄 Refresh';
+}
+
+// ── Error handling ──
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  banner.style.display = 'flex';
+  banner.textContent = '⚠ ' + msg;
+}
+
+function hideError() {
+  document.getElementById('errorBanner').style.display = 'none';
+}
+
+// ── Utilities ──
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch { return iso.slice(0,10); }
+}
+
+// ── Init ──
+fetchData();
+setInterval(fetchData, 60000); // Auto-refresh UI every 60s
+</script>
+</body>
+</html>

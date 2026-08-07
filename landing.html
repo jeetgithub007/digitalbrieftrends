@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="apple-touch-icon" href="/static/favicon.svg">
+<link rel="mask-icon" href="/static/favicon.svg" color="#6366f1">
+<meta name="theme-color" content="#08090d">
+<meta name="msapplication-TileColor" content="#6366f1">
+
+<title>DigitalBrief Trend Pipeline — AI-Powered Trend Intelligence Platform</title>
+<meta name="description" content="Trend Pipeline fetches real-time trending news from 7 sources including Google Trends, GNews, Mediastack, Currents & RSS feeds. Get AI-scored trends, content ideas, and article suggestions for your news website.">
+<meta name="keywords" content="trend pipeline, trending news aggregator, AI trend detection, content ideas generator, article title suggestions, news API aggregation, Google Trends alternative, digital marketing tools, SEO content ideas, real-time trends, mediastack api, gnews api, currents api">
+<meta name="author" content="DigitalBrief">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://digitalbrief.in/trend-pipeline">
+<meta property="og:title" content="Trend Pipeline — AI-Powered Trend Intelligence for Content Creators">
+<meta property="og:description" content="Aggregate trending topics from 7 live sources. Get scored trends, content briefs, and article title suggestions in real-time.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://digitalbrief.in/trend-pipeline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trend Pipeline — AI Trend Intelligence">
+<meta name="twitter:description" content="Multi-source trend aggregation with AI scoring and content suggestions. Built for news publishers and content marketers.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DigitalBrief Trend Pipeline",
+  "applicationCategory": "NewsApplication",
+  "operatingSystem": "All",
+  "description": "AI-powered multi-source trend aggregation platform that fetches trending news from Google Trends, GNews, Mediastack, Currents API, and RSS feeds, with automated deduplication, scoring, and content idea generation.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "featureList": [
+    "7-source trending news aggregation",
+    "AI-powered trend scoring and ranking",
+    "Automated content title suggestions",
+    "Real-time dashboard with source filtering",
+    "REST API for WordPress integration",
+    "Multi-source deduplication",
+    "Regional trend analysis"
+  ]
+}
+</script>
+<style>
+  :root {
+    --bg: #08090d;
+    --surface: #11131a;
+    --surface2: #181b26;
+    --border: #232636;
+    --text: #e4e6f0;
+    --text2: #8a8da6;
+    --accent: #6366f1;
+    --accent2: #818cf8;
+    --accent3: #a5b4fc;
+    --green: #22c55e;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    --gradient-2: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    --gradient-3: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  /* Layout */
+  .container { max-width:1280px; margin:0 auto; padding:0 24px; }
+
+  /* Navigation */
+  .nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(8,9,13,.85); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+    transition:all .3s;
+  }
+  .nav-inner {
+    display:flex; align-items:center; justify-content:space-between;
+    height:68px; max-width:1280px; margin:0 auto; padding:0 24px;
+  }
+  .nav-logo {
+    display:flex; align-items:center; gap:10px;
+    font-size:1.25rem; font-weight:800; color:var(--text);
+    text-decoration:none; letter-spacing:-.5px;
+  }
+  .nav-logo-icon {
+    width:38px; height:38px; background:var(--gradient-1);
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:1.2rem;
+  }
+  .nav-links { display:flex; gap:8px; align-items:center; }
+  .nav-link {
+    padding:8px 16px; border-radius:var(--radius-sm);
+    color:var(--text2); text-decoration:none; font-size:.875rem;
+    font-weight:500; transition:all .2s;
+  }
+  .nav-link:hover { color:var(--text); background:var(--surface2); }
+  .nav-cta {
+    padding:9px 22px; background:var(--gradient-1); border-radius:var(--radius-sm);
+    color:#fff; text-decoration:none; font-size:.875rem; font-weight:600;
+    transition:all .2s; border:none; cursor:pointer;
+  }
+  .nav-cta:hover { transform:translateY(-1px); box-shadow:0 4px 16px rgba(99,102,241,.4); }
+
+  /* Hero */
+  .hero {
+    padding:160px 0 100px; position:relative; overflow:hidden;
+    text-align:center;
+  }
+  .hero::before {
+    content:''; position:absolute; top:-200px; left:50%; transform:translateX(-50%);
+    width:800px; height:800px; background:radial-gradient(circle, rgba(99,102,241,.15) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .hero::after {
+    content:''; position:absolute; bottom:-200px; right:-100px;
+    width:500px; height:500px; background:radial-gradient(circle, rgba(6,182,212,.1) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 16px; border-radius:100px;
+    background:rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.25);
+    font-size:.8rem; color:var(--accent2); margin-bottom:28px;
+  }
+  .hero-badge-dot {
+    width:8px; height:8px; border-radius:50%; background:var(--green);
+    animation:pulse-dot 2s infinite;
+  }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .hero h1 {
+    font-size:clamp(2.2rem, 5vw, 3.8rem); font-weight:800;
+    line-height:1.15; letter-spacing:-1.5px; margin-bottom:20px;
+    position:relative; z-index:1;
+  }
+  .hero h1 span { background:var(--gradient-1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .hero-subtitle {
+    font-size:clamp(1rem, 2vw, 1.2rem); color:var(--text2);
+    max-width:680px; margin:0 auto 36px; line-height:1.7;
+  }
+  .hero-actions { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; position:relative; z-index:1; }
+  .btn {
+    padding:14px 32px; border-radius:var(--radius-sm); font-size:1rem;
+    font-weight:600; text-decoration:none; transition:all .25s;
+    display:inline-flex; align-items:center; gap:8px; border:none; cursor:pointer;
+  }
+  .btn-primary {
+    background:var(--gradient-1); color:#fff;
+    box-shadow:0 4px 20px rgba(99,102,241,.35);
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(99,102,241,.5); }
+  .btn-outline {
+    background:transparent; color:var(--text); border:1.5px solid var(--border);
+  }
+  .btn-outline:hover { border-color:var(--accent2); background:rgba(99,102,241,.08); }
+
+  /* Stats bar */
+  .stats-bar {
+    display:flex; justify-content:center; gap:48px;
+    padding:48px 0; flex-wrap:wrap;
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  }
+  .stat-item { text-align:center; }
+  .stat-num { font-size:2.4rem; font-weight:800; background:var(--gradient-1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .stat-label { font-size:.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+  /* Sections */
+  .section { padding:100px 0; }
+  .section-label {
+    font-size:.75rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:2px; color:var(--accent2); margin-bottom:12px;
+  }
+  .section h2 {
+    font-size:clamp(1.8rem, 3.5vw, 2.6rem); font-weight:800;
+    letter-spacing:-.8px; margin-bottom:16px; line-height:1.2;
+  }
+  .section-desc {
+    font-size:1.05rem; color:var(--text2); max-width:600px;
+    margin-bottom:48px; line-height:1.7;
+  }
+  .section-header { text-align:center; margin-bottom:56px; }
+  .section-header .section-desc { margin:0 auto 0; }
+
+  /* Source grid */
+  .sources-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:16px;
+  }
+  .source-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:24px;
+    transition:all .25s;
+  }
+  .source-card:hover { border-color:var(--accent); transform:translateY(-3px); }
+  .source-icon {
+    width:48px; height:48px; border-radius:var(--radius-sm);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; margin-bottom:16px;
+  }
+  .source-icon.google { background:rgba(66,133,244,.15); }
+  .source-icon.news { background:rgba(99,102,241,.15); }
+  .source-icon.rss { background:rgba(245,158,11,.15); }
+  .source-card h4 { font-size:1rem; font-weight:700; margin-bottom:6px; }
+  .source-card p { font-size:.82rem; color:var(--text2); line-height:1.5; }
+  .source-status {
+    display:inline-flex; align-items:center; gap:6px;
+    margin-top:12px; font-size:.72rem; font-weight:600;
+  }
+  .source-status.live { color:var(--green); }
+  .source-status .dot { width:6px; height:6px; border-radius:50%; background:var(--green); }
+
+  /* Features grid */
+  .features-grid {
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+    gap:20px;
+  }
+  .feature-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:28px;
+    transition:all .25s;
+  }
+  .feature-card:hover { border-color:var(--accent); }
+  .feature-icon {
+    width:52px; height:52px; border-radius:var(--radius-sm);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.5rem; margin-bottom:18px;
+  }
+  .feature-card h4 { font-size:1.05rem; font-weight:700; margin-bottom:8px; }
+  .feature-card p { font-size:.85rem; color:var(--text2); line-height:1.6; }
+
+  /* API section */
+  .api-showcase {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); overflow:hidden;
+    max-width:900px; margin:0 auto;
+  }
+  .api-header {
+    display:flex; align-items:center; gap:12px;
+    padding:14px 20px; background:var(--surface2);
+    border-bottom:1px solid var(--border);
+  }
+  .api-dot { width:12px; height:12px; border-radius:50%; }
+  .api-dot.red { background:#ef4444; }
+  .api-dot.yellow { background:#f59e0b; }
+  .api-dot.green { background:#22c55e; }
+  .api-url { font-size:.78rem; color:var(--text2); font-family:'JetBrains Mono', monospace; }
+  .api-method {
+    padding:2px 8px; border-radius:4px; font-size:.7rem; font-weight:700;
+    font-family:'JetBrains Mono', monospace;
+  }
+  .api-method.get { background:rgba(34,197,94,.15); color:var(--green); }
+  .api-body {
+    padding:20px; font-family:'JetBrains Mono', monospace;
+    font-size:.78rem; line-height:2; color:var(--text2);
+    overflow-x:auto;
+  }
+  .api-key { color:#818cf8; }
+  .api-string { color:#22c55e; }
+  .api-number { color:#f59e0b; }
+  .api-bracket { color:var(--text2); }
+
+  /* How it works */
+  .steps-grid {
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:24px; counter-reset:step;
+  }
+  .step-card {
+    position:relative; padding:32px 24px 24px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius);
+  }
+  .step-card::before {
+    counter-increment:step; content:counter(step);
+    position:absolute; top:-16px; left:24px;
+    width:36px; height:36px; background:var(--gradient-1);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:.85rem; font-weight:800; color:#fff;
+  }
+  .step-card h4 { margin-top:8px; font-size:1rem; font-weight:700; }
+  .step-card p { font-size:.82rem; color:var(--text2); margin-top:8px; line-height:1.5; }
+
+  /* CTA section */
+  .cta-section {
+    text-align:center; padding:100px 0;
+    position:relative; overflow:hidden;
+  }
+  .cta-section::before {
+    content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:600px; height:600px; background:radial-gradient(circle, rgba(99,102,241,.12) 0%, transparent 70%);
+    pointer-events:none;
+  }
+
+  /* Footer */
+  .footer {
+    border-top:1px solid var(--border); padding:48px 0 32px;
+    text-align:center;
+  }
+  .footer p { font-size:.82rem; color:var(--text2); }
+  .footer a { color:var(--accent2); text-decoration:none; }
+  .footer a:hover { text-decoration:underline; }
+
+  /* Responsive */
+  @media (max-width:768px) {
+    .nav-links { display:none; }
+    .hero { padding:120px 0 60px; }
+    .hero h1 { font-size:2rem; }
+    .stats-bar { gap:24px; }
+    .stat-num { font-size:1.8rem; }
+    .section { padding:60px 0; }
+    .sources-grid, .features-grid { grid-template-columns:1fr; }
+    .btn { padding:12px 24px; font-size:.9rem; }
+  }
+
+  @media (max-width:480px) {
+    .hero h1 { font-size:1.7rem; }
+    .hero-actions { flex-direction:column; }
+    .btn { width:100%; justify-content:center; }
+    .steps-grid { grid-template-columns:1fr; }
+  }
+
+  /* Accessibility */
+  @media (prefers-reduced-motion:reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+  :focus-visible { outline:2px solid var(--accent2); outline-offset:2px; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo" aria-label="Trend Pipeline Home">
+      <div class="nav-logo-icon">📈</div>
+      Trend Pipeline
+    </a>
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#sources" class="nav-link">Sources</a>
+      <a href="#api" class="nav-link">API</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="/dashboard" class="nav-cta">Open Dashboard →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="container">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Live — Aggregating trends from 5 sources
+    </div>
+    <h1 id="hero-heading">Discover What the World Is<br><span>Talking About Right Now</span></h1>
+    <p class="hero-subtitle">
+      Trend Pipeline aggregates trending topics from Google Trends, GNews, Mediastack, Currents API,
+      and RSS feeds. AI-powered scoring ranks every story, deduplicates across sources, and generates
+      ready-to-use article title suggestions — built for content creators and news publishers.
+    </p>
+    <div class="hero-actions">
+      <a href="/dashboard" class="btn btn-primary">🚀 Launch Dashboard</a>
+      <a href="#features" class="btn btn-outline">Explore Features ↓</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">7</div>
+    <div class="stat-label">News Sources</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">150+</div>
+    <div class="stat-label">Trends Per Refresh</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">30min</div>
+    <div class="stat-label">Auto Refresh</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">REST</div>
+    <div class="stat-label">API Ready</div>
+  </div>
+</div>
+
+<!-- Sources -->
+<section class="section" id="sources" aria-labelledby="sources-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Data Sources</div>
+      <h2 id="sources-heading">Powered by 7 Live News APIs</h2>
+      <p class="section-desc">Every refresh pulls fresh data from multiple sources in parallel — no single point of failure, no echo chamber.</p>
+    </div>
+    <div class="sources-grid">
+      <div class="source-card">
+        <div class="source-icon google">🔍</div>
+        <h4>Google Trends</h4>
+        <p>Real-time search interest, regional breakdowns, and rising queries via pytrends.</p>
+        <span class="source-status live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon news">📰</div>
+        <h4>GNews API</h4>
+        <p>Google News headlines across technology, business, science, and general categories.</p>
+        <span class="source-status live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon news">🌐</div>
+        <h4>Mediastack</h4>
+        <p>Live news from thousands of sources worldwide with category and country filters.</p>
+        <span class="source-status live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon news">⚡</div>
+        <h4>Currents API</h4>
+        <p>Latest news with multi-language support and intelligent category classification.</p>
+        <span class="source-status live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon rss">📡</div>
+        <h4>RSS Feeds</h4>
+        <p>8 feeds from TechCrunch, The Verge, Wired, Ars Technica, Hacker News, and more.</p>
+        <span class="source-status live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon google">💬</div>
+        <h4>Reddit</h4>
+        <p>Trending posts from r/technology, r/artificial, r/startups, and 9 other subreddits.</p>
+        <span class="source-status" style="color:var(--orange)">⚙ Configure API key</span>
+      </div>
+      <div class="source-card">
+        <div class="source-icon news">📰</div>
+        <h4>NewsAPI.org</h4>
+        <p>Headlines from 80,000+ sources across technology, business, and science categories.</p>
+        <span class="source-status" style="color:var(--orange)">⚙ Configure API key</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features" aria-labelledby="features-heading" style="background:var(--surface);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Platform Features</div>
+      <h2 id="features-heading">Everything You Need to Stay Ahead</h2>
+      <p class="section-desc">From raw data to publishable content — one integrated pipeline.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(99,102,241,.12);">🔄</div>
+        <h4>Multi-Source Aggregation</h4>
+        <p>Fetch trending topics from all 7 sources simultaneously. Parallel async requests ensure the pipeline completes in under 90 seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,197,94,.12);">🧠</div>
+        <h4>AI Trend Scoring</h4>
+        <p>Every trend receives a composite score (0-100) based on source authority, social engagement, search volume, and cross-source validation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,158,11,.12);">🔗</div>
+        <h4>Smart Deduplication</h4>
+        <p>78% similarity detection merges duplicate stories. Multi-source appearances earn a +25 bonus — the most validated stories rise to the top.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(6,182,212,.12);">💡</div>
+        <h4>Content Idea Generator</h4>
+        <p>Auto-generates 3 article angles per trend with suggested titles. Filter by score threshold to get only high-value content opportunities.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(239,68,68,.12);">🌍</div>
+        <h4>Regional Trend Analysis</h4>
+        <p>See which Indian states are searching for your keywords. Chandigarh leads for SEO, Telangana dominates AI tools, Kerala tops digital marketing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(168,85,247,.12);">📊</div>
+        <h4>Live Dashboard</h4>
+        <p>Real-time filterable dashboard with source toggles, score sliders, and auto-refresh. Desktop and mobile responsive with dark theme.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(34,197,94,.12);">🔌</div>
+        <h4>REST API</h4>
+        <p>Full REST API with Swagger docs. WordPress shortcode and JavaScript widget ready — integrate trends into any website in minutes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(99,102,241,.12);">⏱️</div>
+        <h4>Auto-Refresh Pipeline</h4>
+        <p>Pipeline runs every 30 minutes automatically. Force refresh anytime via API or dashboard button. Never miss a trending story.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="section" id="how-it-works" aria-labelledby="how-heading">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">How It Works</div>
+      <h2 id="how-heading">From Raw Data to Actionable Insights in 4 Steps</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <h4>Fetch</h4>
+        <p>7 fetchers run in parallel, pulling headlines, trends, and search data from Google Trends, news APIs, RSS feeds, and Reddit simultaneously.</p>
+      </div>
+      <div class="step-card">
+        <h4>Aggregate</h4>
+        <p>All articles merge into one stream. Duplicates detected at 78% title similarity are combined. Multi-source stories earn bonus points.</p>
+      </div>
+      <div class="step-card">
+        <h4>Score & Rank</h4>
+        <p>Every trend receives a composite score (0-100) weighted by source authority, social signals, search volume, and cross-validation.</p>
+      </div>
+      <div class="step-card">
+        <h4>Deliver</h4>
+        <p>Ranked trends flow to the live dashboard, REST API, and content idea generator. Ready for your website, newsletter, or editorial workflow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API Reference -->
+<section class="section" id="api" aria-labelledby="api-heading" style="background:var(--surface);">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Developer API</div>
+      <h2 id="api-heading">REST API Ready for Integration</h2>
+      <p class="section-desc">Full Swagger docs at <code>/docs</code>. Integrate trends into your WordPress site, React app, or custom dashboard in minutes.</p>
+    </div>
+    <div class="api-showcase">
+      <div class="api-header">
+        <span class="api-dot red"></span><span class="api-dot yellow"></span><span class="api-dot green"></span>
+        <span class="api-method get">GET</span>
+        <span class="api-url">/api/trends/top?n=5</span>
+      </div>
+      <div class="api-body">
+<span class="api-bracket">{</span><br>
+&nbsp;&nbsp;<span class="api-key">"data"</span>: <span class="api-bracket">[</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-bracket">{</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-key">"rank"</span>: <span class="api-number">1</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-key">"title"</span>: <span class="api-string">"OpenAI Makes Luna Default for Free ChatGPT"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-key">"score"</span>: <span class="api-number">89</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-key">"sources"</span>: <span class="api-bracket">[</span><span class="api-string">"gnews"</span>, <span class="api-string">"mediastack"</span>, <span class="api-string">"currents"</span><span class="api-bracket">]</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="api-bracket">}</span><br>
+&nbsp;&nbsp;<span class="api-bracket">]</span>,<br>
+&nbsp;&nbsp;<span class="api-key">"total_available"</span>: <span class="api-number">150</span><br>
+<span class="api-bracket">}</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:24px;">
+      <div style="padding:16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.82rem;">
+        <span class="api-method get" style="margin-right:8px;">GET</span><code style="color:var(--text)">/api/trends</code>
+        <p style="color:var(--text2);margin-top:6px;">Full trend data with source, score & category filters</p>
+      </div>
+      <div style="padding:16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.82rem;">
+        <span class="api-method get" style="margin-right:8px;">GET</span><code style="color:var(--text)">/api/trends/top</code>
+        <p style="color:var(--text2);margin-top:6px;">Top N trends — quick dashboard widget</p>
+      </div>
+      <div style="padding:16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.82rem;">
+        <span class="api-method get" style="margin-right:8px;">GET</span><code style="color:var(--text)">/api/trends/ideas</code>
+        <p style="color:var(--text2);margin-top:6px;">Content ideas with article angle suggestions</p>
+      </div>
+      <div style="padding:16px;background:var(--surface2);border-radius:var(--radius-sm);font-size:.82rem;">
+        <span class="api-method get" style="margin-right:8px;">GET</span><code style="color:var(--text)">/api/trends/status</code>
+        <p style="color:var(--text2);margin-top:6px;">Pipeline health, refresh count, error log</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" aria-labelledby="cta-heading">
+  <div class="container">
+    <h2 id="cta-heading" style="font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:800;margin-bottom:16px;">
+      Ready to Discover What's Trending?
+    </h2>
+    <p style="color:var(--text2);font-size:1.05rem;max-width:500px;margin:0 auto 32px;">
+      Launch the dashboard and see 150+ live trends ranked and ready for your next article.
+    </p>
+    <a href="/dashboard" class="btn btn-primary" style="font-size:1.1rem;padding:16px 40px;">
+      🚀 Open Live Dashboard
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <p>Built for <a href="https://digitalbrief.in">DigitalBrief</a> and <a href="https://jeetparganiha.in">Jeet Digital Marketing Agency</a></p>
+    <p style="margin-top:8px;font-size:.75rem;">© 2026 Trend Pipeline. Powered by Google Trends, GNews, Mediastack, Currents API & RSS.</p>
+  </div>
+</footer>
+
+</body>
+</html>
