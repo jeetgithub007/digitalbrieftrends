@@ -1,34 +1,11 @@
 {
-  "builds": [
-    {
-      "src": "server.py",
-      "use": "@vercel/python"
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.13"
     }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "server.py"
-    },
-    {
-      "src": "/dashboard",
-      "dest": "server.py"
-    },
-    {
-      "src": "/docs",
-      "dest": "server.py"
-    },
-    {
-      "src": "/openapi.json",
-      "dest": "server.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "server.py"
-    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/api/index" }
   ]
 }

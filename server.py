@@ -14,9 +14,7 @@ import asyncio
 import logging
 import os
 import sys
-from contextlib import asynccontextmanager
 
-# Ensure the pipeline directory is in path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI, Query
@@ -40,19 +38,20 @@ logger = logging.getLogger("trend-pipeline.server")
 # ---- App lifetime ----
 IS_VERCEL = os.getenv("VERCEL", "") == "1" or os.path.exists("/vercel")
 
-if not IS_VERCEL:
-    @asynccontextmanager
-    async def lifespan(app: FastAPI):
-        # Startup: start refresh loop (runs first fetch in background)
-        logger.info("Server starting — pipeline will fetch in background...")
-        refresh_task = asyncio.create_task(refresh_loop())
-        yield  # Server is running
-        refresh_task.cancel()
-        logger.info("Server shutting down")
+# Always create app at top level — Vercel needs this for detection
+app = FastAPI(title="Trend Pipeline", version="1.0.0", docs_url="/docs")
 
-    app = FastAPI(title="Trend Pipeline", version="1.0.0", lifespan=lifespan, docs_url="/docs")
+if not IS_VERCEL:
+    # Local mode: start background refresh loop on startup
+    @app.on_event("startup")
+    async def startup_refresh():
+        logger.info("Server starting — pipeline will fetch in background...")
+        asyncio.create_task(refresh_loop())
+
+    @app.on_event("shutdown")
+    async def shutdown_refresh():
+        logger.info("Server shutting down")
 else:
-    app = FastAPI(title="Trend Pipeline", version="1.0.0", docs_url="/docs")
     logger.info("Vercel environment detected — pipeline runs on-demand only")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
