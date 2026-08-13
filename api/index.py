@@ -1,138 +1,272 @@
 """
-Vercel serverless entry point for Trend Pipeline.
-Self-contained FastAPI app — built for Vercel's @vercel/python runtime.
+DigitalBrief Trend Pipeline — Unified Entry Point
+==================================================
+Works locally (python api/index.py) AND on Vercel.
+All routes, pages, and API endpoints in one file.
 """
-import sys
-import os
-import asyncio
-import logging
+import sys, os, asyncio, logging
 
-# Ensure project root is on Python path (Vercel root = repo root)
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Path setup — works in both local and Vercel environments
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT)
 
-# ---- Logging ----
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s")
-logger = logging.getLogger("trend-pipeline.vercel")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(levelname)s: %(message)s", datefmt="%H:%M:%S")
+logger = logging.getLogger("trends")
 
-# ---- Build FastAPI App ----
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
-# ═══ EXPORT: app at module level (required by Vercel) ═══
-app = FastAPI(title="Trend Pipeline", version="1.0.0", docs_url="/docs")
+# ═══ APP (at module level — required by Vercel) ═══
+app = FastAPI(title="Trend Pipeline", version="2.0", docs_url="/docs")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# ═══ Import pipeline components ═══
-from config import REFRESH_INTERVAL_MINUTES
-from cache import cache
-from engine import run_pipeline
-from aggregator import TrendSummary
+# Static files
+_STATIC = os.path.join(ROOT, "static")
+if os.path.isdir(_STATIC):
+    app.mount("/static", StaticFiles(directory=_STATIC), name="static")
 
-# ═══ Page routes ═══
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LANDING_PATH = os.path.join(BASE_DIR, "landing.html")
-DASHBOARD_PATH = os.path.join(BASE_DIR, "dashboard.html")
+# ═══ Imports (after app to avoid circular issues) ═══
+from core.config import IS_VERCEL, REFRESH_INTERVAL_MINUTES, NEWS_CHANNELS
+from core.cache import cache
+from core.engine import run_pipeline, refresh_loop
+from core.aggregator import TrendSummary
+from core.enrichment import generate_article, generate_social, normalize_category
 
+
+# ═══ Trend serialization (includes enrichment fields) ═══
+def _serialize_trend(t):
+    """Serialize a trend with all enrichment fields (optional/graceful)."""
+    return {
+        "rank": t.get("rank"),
+        "title": t.get("title", ""),
+        "url": t.get("url", ""),
+        "trend_score": t.get("trend_score", 0),
+        "seo_score": t.get("seo_score"),
+        "growth_percentage": t.get("growth_percentage"),
+        "category": normalize_category(t.get("category")),
+        "publisher": (t.get("publisher") or (t.get("raw_data") or {}).get("publisher", "") or ""),
+        "sources": t.get("sources", [t.get("source", "")]),
+        "description": (t.get("description") or "")[:200],
+        "published_at": t.get("published_at", ""),
+        "subreddit": t.get("subreddit"),
+        "image_url": t.get("image_url", ""),
+        "image_source": t.get("image_source", ""),
+        "image_license": t.get("image_license", ""),
+        "related_keywords": t.get("related_keywords", []),
+        "related_topics": t.get("related_topics", []),
+        "region": t.get("region", ""),
+        "language": t.get("language", "en"),
+        "retrieved_at": t.get("retrieved_at", ""),
+        "saved": t.get("title", "") in cache.saved_titles(),
+        "dismissed": t.get("title", "") in cache.dismissed_titles(),
+    }
+
+# ═══════════════════════════════════════
+# PAGES
+# ═══════════════════════════════════════
 
 @app.get("/", response_class=HTMLResponse)
 async def landing():
-    if os.path.exists(LANDING_PATH):
-        with open(LANDING_PATH, "r", encoding="utf-8") as f:
-            return f.read()
-    return "<h1>Trend Pipeline</h1><p>Landing page not found.</p>"
-
+    path = os.path.join(ROOT, "landing.html")
+    if os.path.exists(path):
+        return open(path, encoding="utf-8").read()
+    return HTMLResponse("<h1>Trend Pipeline</h1>", status_code=200)
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard():
-    if os.path.exists(DASHBOARD_PATH):
-        with open(DASHBOARD_PATH, "r", encoding="utf-8") as f:
-            return f.read()
-    return "<h1>Dashboard</h1><p>Dashboard not found.</p>"
+    path = os.path.join(ROOT, "dashboard.html")
+    if os.path.exists(path):
+        return open(path, encoding="utf-8").read()
+    return HTMLResponse("<h1>Dashboard loading...</h1>", status_code=200)
 
-
-# ═══ API Endpoints ═══
+# ═══════════════════════════════════════
+# API
+# ═══════════════════════════════════════
 
 @app.get("/api/trends/status")
-async def status():
+async def api_status():
     return cache.status()
 
-
 @app.get("/api/trends")
-async def get_trends(
-    limit: int = Query(50, ge=1, le=100),
-    min_score: int = Query(0, ge=0, le=100),
-    source: str = Query(None),
-    category: str = Query(None),
-):
-    data, updated_at, refresh_count = cache.get()
+async def api_trends(limit: int = Query(50, ge=1, le=100), min_score: int = Query(0, ge=0, le=100),
+                     source: str = Query(None)):
+    data, _, _ = cache.get()
     if data is None:
-        # Trigger pipeline on first request (Vercel serverless — fire-and-forget)
-        try:
+        if IS_VERCEL:
             asyncio.create_task(run_pipeline())
-        except Exception:
-            pass
-        return {"data": [], "status": "no_data", "message": "Pipeline initializing — retry in 30 seconds"}
+        return {"data": [], "status": "no_data", "message": "Initializing — retry in 30s"}
 
-    filtered = []
-    for t in data:
-        if t["trend_score"] < min_score:
-            continue
-        if source and source not in t.get("sources", [t["source"]]):
-            continue
-        if category:
-            cat = TrendSummary._guess_category(t)
-            if cat.lower() != category.lower():
-                continue
-        filtered.append(t)
-
+    filtered = [t for t in data if t["trend_score"] >= min_score
+                and (not source or source in t.get("sources", [t["source"]]))]
     filtered = filtered[:limit]
-    clean = []
-    for t in filtered:
-        clean.append({
-            "rank": t["rank"],
-            "title": t["title"],
-            "url": t.get("url", ""),
-            "trend_score": t["trend_score"],
-            "sources": t.get("sources", [t.get("source", "")]),
-            "description": t.get("description", "")[:200],
-            "published_at": t.get("published_at", ""),
-            "subreddit": t.get("subreddit"),
-            "extra": {k: v for k, v in t.get("raw_data", {}).items() if k not in ("source",)},
-        })
+    clean = [_serialize_trend(t) for t in filtered]
+    return {"data": clean, "total": len(clean), "pipeline": {"last_refresh": cache.status()["last_updated"],
+            "refresh_count": cache.status()["refresh_count"], "age_seconds": cache.status().get("age_seconds")}}
 
-    return {
-        "data": clean,
-        "total": len(clean),
-        "pipeline": {
-            "last_refresh": cache.status()["last_updated"],
-            "refresh_count": refresh_count,
-            "next_refresh_minutes": REFRESH_INTERVAL_MINUTES,
-            "age_seconds": cache.status().get("age_seconds"),
-        },
+
+@app.get("/api/trends/enriched")
+async def api_trends_enriched(
+        limit: int = Query(50, ge=1, le=100),
+        sort: str = Query("score", description="score|seo|growth|latest"),
+        category: str = Query(None),
+        min_score: int = Query(0, ge=0, le=100)):
+    """Enriched trends with flexible sorting and category filter."""
+    data, _, _ = cache.get()
+    if data is None:
+        if IS_VERCEL:
+            asyncio.create_task(run_pipeline())
+        return {"data": [], "status": "no_data", "message": "Initializing — retry in 30s"}
+
+    items = [t for t in data if t["trend_score"] >= min_score]
+    if category:
+        norm = normalize_category(category)
+        items = [t for t in items if normalize_category(t.get("category")) == norm]
+
+    key_map = {
+        "score": lambda t: t.get("trend_score", 0),
+        "seo": lambda t: t.get("seo_score", 0) or 0,
+        "growth": lambda t: t.get("growth_percentage", -1) if t.get("growth_percentage") is not None else -1,
+        "latest": lambda t: t.get("published_at", "") or "",
     }
+    key = key_map.get(sort, key_map["score"])
+    items.sort(key=key, reverse=True)
 
+    clean = [_serialize_trend(t) for t in items[:limit]]
+    return {"data": clean, "total": len(clean),
+            "categories": sorted({normalize_category(t.get("category")) for t in data})}
 
 @app.get("/api/trends/top")
-async def get_top(n: int = Query(10, ge=1, le=30)):
+async def api_top(n: int = Query(10, ge=1, le=30)):
     data, _, _ = cache.get()
     if data is None:
         return {"data": [], "status": "no_data"}
     return {"data": TrendSummary.top_rising(data, n), "total_available": len(data)}
 
-
 @app.get("/api/trends/ideas")
-async def get_content_ideas(min_score: int = Query(50, ge=0, le=100)):
+async def api_ideas(min_score: int = Query(50, ge=0, le=100)):
     data, _, _ = cache.get()
     if data is None:
         return {"data": [], "status": "no_data"}
     return {"data": TrendSummary.content_ideas(data, min_score)}
 
-
 @app.get("/api/trends/refresh")
-async def force_refresh():
+async def api_refresh():
     try:
         await run_pipeline()
-        return {"status": "ok", "message": "Refresh complete"}
+        return {"status": "ok"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+# ═══════════════════════════════════════
+# Trend actions (enrichment + content)
+# ═══════════════════════════════════════
+
+def _find_trend(rank):
+    data, _, _ = cache.get()
+    if not data:
+        return None
+    for t in data:
+        if t.get("rank") == rank:
+            return t
+    return None
+
+
+@app.get("/api/trends/{rank}/article")
+async def api_article(rank: int):
+    t = _find_trend(rank)
+    if not t:
+        return {"status": "not_found"}
+    return {"status": "ok", "trend": _serialize_trend(t), "article": generate_article(t)}
+
+
+@app.get("/api/trends/{rank}/social")
+async def api_social(rank: int):
+    t = _find_trend(rank)
+    if not t:
+        return {"status": "not_found"}
+    return {"status": "ok", "trend": _serialize_trend(t), "social": generate_social(t)}
+
+
+@app.post("/api/trends/{rank}/save")
+async def api_save(rank: int):
+    t = _find_trend(rank)
+    if not t:
+        return {"status": "not_found"}
+    return cache.save(t["title"])
+
+
+@app.post("/api/trends/{rank}/dismiss")
+async def api_dismiss(rank: int):
+    t = _find_trend(rank)
+    if not t:
+        return {"status": "not_found"}
+    return cache.dismiss(t["title"])
+
+
+@app.get("/api/channels")
+async def api_channels():
+    """News-channel registry from the source config (URLs sanitized to http/https)."""
+    from urllib.parse import urlparse
+    import re
+    out = []
+    for c in NEWS_CHANNELS:
+        if not c.get("active", True):
+            continue
+        entry = dict(c)
+        # Sanitize external URLs: only http/https allowed
+        u = entry.get("website")
+        if u and urlparse(u).scheme not in ("http", "https"):
+            entry["website"] = ""
+        # YouTube channel ids must look like channel ids (UC + 22 chars)
+        y = entry.get("youtube")
+        if y and not re.fullmatch(r"UC[\w-]{22}", y):
+            entry["youtube"] = ""
+        out.append(entry)
+    return {"data": out, "total": len(out)}
+
+
+@app.get("/api/trends/saved")
+async def api_saved_list():
+    titles = cache.saved_titles()
+    data, _, _ = cache.get() or (None, None, 0)
+    if data:
+        items = [_serialize_trend(t) for t in data if t.get("title") in titles]
+    else:
+        items = []
+    return {"data": items, "total": len(items)}
+
+
+# ═══════════════════════════════════════
+# STARTUP — background refresh (local only)
+# ═══════════════════════════════════════
+
+async def _delayed_startup():
+    """Delay pipeline start so server can serve requests immediately."""
+    await asyncio.sleep(5)
+    logger.info("Local mode — background pipeline starting")
+    asyncio.create_task(refresh_loop())
+
+
+@app.on_event("startup")
+async def on_startup():
+    if not IS_VERCEL:
+        asyncio.create_task(_delayed_startup())
+        logger.info("Server ready — pipeline will start in 5s")
+    else:
+        logger.info("Vercel mode — on-demand only")
+
+
+# ═══════════════════════════════════════
+# CLI — run locally
+# ═══════════════════════════════════════
+if __name__ == "__main__":
+    import uvicorn
+    from core.config import HOST, PORT
+    print(f"\n  Trend Pipeline v2.0")
+    print(f"  http://{HOST}:{PORT}            Landing")
+    print(f"  http://{HOST}:{PORT}/dashboard  Dashboard")
+    print(f"  http://{HOST}:{PORT}/docs       API Docs\n")
+    uvicorn.run("api.index:app", host=HOST, port=PORT, reload=False, log_level="info")

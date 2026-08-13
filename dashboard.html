@@ -219,6 +219,102 @@
     .stat { padding: 8px 12px; }
     .stat-value { font-size: 1.1rem; }
   }
+
+  /* ── Enrichment additions ── */
+  .sort-row { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .btn-sm { padding:5px 10px; font-size:0.78rem; }
+  .trend-badges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; align-items:center; }
+  .category-badge { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; font-size:0.7rem; font-weight:600; padding:3px 9px; border-radius:99px; }
+  .growth-badge { font-size:0.72rem; font-weight:700; padding:3px 8px; border-radius:6px; }
+  .growth-badge.up { background:rgba(16,185,129,0.15); color:#34d399; }
+  .growth-badge.down { background:rgba(239,68,68,0.15); color:#f87171; }
+  .seo-badge { background:rgba(99,102,241,0.15); color:#a5b4fc; font-size:0.72rem; font-weight:600; padding:3px 8px; border-radius:6px; }
+  .kw-chip { display:inline-block; background:var(--surface2,#151a24); color:var(--text2,#94a3b8); font-size:0.72rem; padding:3px 9px; border-radius:99px; margin:2px 3px 2px 0; border:1px solid var(--border,#232636); }
+  .trend-img { width:100%; height:130px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
+  .trend-keywords { margin-top:8px; }
+  .trend-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; padding-top:10px; border-top:1px solid var(--border,#232636); }
+  .action-btn { background:var(--surface2,#151a24); color:var(--text,#e2e8f0); border:1px solid var(--border,#232636); border-radius:7px; padding:5px 10px; font-size:0.74rem; cursor:pointer; transition:border-color .15s, background .15s; }
+  .action-btn:hover { border-color:var(--accent,#6366f1); background:rgba(99,102,241,0.12); }
+  .action-btn.saved { background:rgba(16,185,129,0.15); color:#34d399; border-color:#10b981; }
+  .action-btn.dismiss:hover { border-color:#ef4444; background:rgba(239,68,68,0.12); }
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:999; padding:20px; }
+  .modal-box { background:var(--surface,#0f1117); border:1px solid var(--border,#232636); border-radius:14px; max-width:640px; width:100%; max-height:85vh; overflow-y:auto; }
+  .modal-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border,#232636); }
+  .modal-head h3 { margin:0; font-size:1rem; }
+  .modal-close { background:none; border:none; color:var(--text2,#94a3b8); font-size:1.1rem; cursor:pointer; }
+  .modal-body { padding:18px 20px; line-height:1.6; font-size:0.9rem; }
+  .detail-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; }
+  .detail-grid > div { background:var(--surface2,#151a24); padding:10px; border-radius:8px; font-size:0.82rem; }
+  .social-post { background:var(--surface2,#151a24); border:1px solid var(--border,#232636); border-radius:10px; padding:14px; white-space:pre-wrap; font-size:0.88rem; }
+
+  /* ── Category navigation ── */
+  .cat-nav { display:flex; gap:8px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:thin; -webkit-overflow-scrolling:touch; }
+  .cat-nav::-webkit-scrollbar { height:5px; }
+  .cat-nav::-webkit-scrollbar-thumb { background:var(--border,#232636); border-radius:99px; }
+  .cat-chip { flex:0 0 auto; background:var(--surface2,#151a24); color:var(--text2,#94a3b8); border:1px solid var(--border,#232636); border-radius:99px; padding:7px 15px; font-size:0.8rem; cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .cat-chip:hover { border-color:var(--accent,#6366f1); color:var(--text,#e2e8f0); }
+  .cat-chip.active { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border-color:transparent; }
+
+  /* ── Top trending hero ── */
+  .hero-grid { display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:22px; }
+  .hero-feature { display:grid; grid-template-columns:1fr; gap:0; background:var(--surface,#0f1117); border:1px solid var(--border,#232636); border-radius:16px; overflow:hidden; }
+  .hero-feature .hero-img { width:100%; height:200px; object-fit:cover; display:block; }
+  .hero-feature .hero-body { padding:18px 20px; }
+  .hero-feature h2 { margin:0 0 10px; font-size:1.3rem; line-height:1.35; }
+  .hero-feature h2 a { color:inherit; text-decoration:none; }
+  .hero-feature h2 a:hover { color:var(--accent2,#a5b4fc); }
+  .hero-keypoints { list-style:none; padding:0; margin:12px 0 0; display:flex; flex-direction:column; gap:6px; }
+  .hero-keypoints li { font-size:0.85rem; color:var(--text2,#cbd5e1); padding-left:20px; position:relative; line-height:1.5; }
+  .hero-keypoints li::before { content:'▸'; position:absolute; left:2px; color:var(--accent,#6366f1); }
+  .hero-side { display:grid; grid-template-columns:1fr; gap:16px; }
+  .hero-mini { display:flex; gap:14px; background:var(--surface,#0f1117); border:1px solid var(--border,#232636); border-radius:14px; padding:14px; align-items:center; }
+  .hero-mini img { width:80px; height:80px; object-fit:cover; border-radius:10px; flex:0 0 auto; }
+  .hero-mini .hm-body { min-width:0; }
+  .hero-mini h3 { margin:0 0 6px; font-size:0.95rem; line-height:1.35; }
+  .hero-mini h3 a { color:inherit; text-decoration:none; }
+  .hero-mini h3 a:hover { color:var(--accent2,#a5b4fc); }
+  .hero-mini p { margin:0; font-size:0.8rem; color:var(--text2,#94a3b8); line-height:1.45; }
+  @media (min-width:820px) {
+    .hero-grid { grid-template-columns:1.6fr 1fr; }
+    .hero-feature { grid-template-columns:1fr; }
+    .hero-feature .hero-img { height:260px; }
+    .hero-side { grid-template-columns:1fr; }
+  }
+
+  /* ── Subscription popup ── */
+  .sub-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; backdrop-filter:blur(3px); }
+  .sub-box { background:var(--surface,#0f1117); border:1px solid var(--border,#232636); border-radius:16px; max-width:440px; width:100%; padding:28px; text-align:center; }
+  .sub-box .sub-emoji { font-size:2.2rem; margin-bottom:8px; }
+  .sub-box h3 { margin:0 0 8px; font-size:1.2rem; }
+  .sub-box p { margin:0 0 18px; color:var(--text2,#94a3b8); font-size:0.88rem; line-height:1.5; }
+  .sub-box input[type=email] { width:100%; padding:12px 14px; background:var(--surface2,#151a24); color:var(--text,#e2e8f0); border:1px solid var(--border,#232636); border-radius:10px; font-size:0.9rem; margin-bottom:12px; box-sizing:border-box; }
+  .sub-box input[type=email]:focus { outline:none; border-color:var(--accent,#6366f1); }
+  .sub-box .sub-btn { width:100%; padding:12px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:10px; font-size:0.95rem; font-weight:600; cursor:pointer; }
+  .sub-box .sub-btn:disabled { opacity:0.6; cursor:default; }
+  .sub-box .sub-later { background:none; border:none; color:var(--text2,#94a3b8); font-size:0.8rem; cursor:pointer; margin-top:12px; }
+  .sub-box .sub-msg { font-size:0.8rem; margin-top:10px; min-height:1.2em; }
+  .sub-box .sub-msg.ok { color:#34d399; }
+  .sub-box .sub-msg.err { color:#f87171; }
+
+  /* ── Video News Section ── */
+  .video-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.1rem; }
+  .video-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:border-color .2s; }
+  .video-card:hover { border-color:var(--accent2); }
+  .video-head { display:flex; align-items:center; gap:.55rem; padding:.7rem .9rem; }
+  .video-live { background:#ef4444; color:#fff; font-size:.65rem; font-weight:700; padding:2px 7px; border-radius:4px; letter-spacing:.04em; }
+  .video-name { font-weight:600; font-size:.92rem; }
+  .video-region { margin-left:auto; color:var(--text2); font-size:.72rem; }
+  .video-embed { position:relative; width:100%; padding-top:56.25%; background:#000; }
+  .video-embed iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .video-watch { display:block; padding:.6rem .9rem .8rem; font-size:.78rem; color:var(--accent2); text-decoration:none; }
+  .video-watch:hover { text-decoration:underline; }
+  .video-actions { display:flex; flex-wrap:wrap; gap:.9rem; padding:.5rem .9rem .8rem; }
+  .video-actions .video-watch { padding:0; }
+  .video-live.off { background:#64748b; }
+  .video-link-body { padding:.1rem .9rem .9rem; }
+  .video-link-body p { color:var(--text2); font-size:.8rem; line-height:1.45; margin:0 0 .8rem; }
+  .publisher-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; background:#22c55e22; color:#22c55e; }
+  .video-note { color:var(--text2); font-size:.78rem; margin-top:.8rem; }
 </style>
 </head>
 <body>
@@ -226,6 +322,7 @@
   <!-- Header -->
   <div class="header">
     <h1><a href="/" style="color:inherit;text-decoration:none;font-size:.75rem;opacity:.6;margin-right:12px;">← Home</a>📈 DigitalBrief <span>Trend Pipeline</span></h1>
+    <button class="btn btn-sm" onclick="openSubscription()" style="margin-left:auto;" aria-label="Subscribe to news">🔔 Subscribe</button>
     <div class="header-stats" id="headerStats">
       <div class="stat"><div class="stat-value">-</div><div class="stat-label">Total Trends</div></div>
       <div class="stat"><div class="stat-value">-</div><div class="stat-label">Sources</div></div>
@@ -243,6 +340,11 @@
   <!-- Error Banner (hidden by default) -->
   <div class="error-banner" id="errorBanner" style="display:none;"></div>
 
+  <!-- Category Navigation -->
+  <nav class="cat-nav" id="catNav" aria-label="News categories">
+    <button class="cat-chip active" data-cat="all" onclick="filterByCategory('all')">🔥 All</button>
+  </nav>
+
   <!-- Controls -->
   <div class="controls">
     <button class="btn active" data-source="all" onclick="filterSourceAll()">All (7)</button>
@@ -258,11 +360,28 @@
       <input type="range" id="minScore" min="0" max="100" value="0" oninput="filterByScore(this.value)">
       <span id="scoreValue" style="font-weight:700;color:var(--accent2);min-width:3ch">0</span>
     </div>
+    <div class="sort-row">
+      <label style="font-size:0.8rem;color:var(--text2);">Sort:</label>
+      <button class="btn btn-sm active" data-sort="score" onclick="sortBy('score')">Trend Score</button>
+      <button class="btn btn-sm" data-sort="seo" onclick="sortBy('seo')">SEO Score</button>
+      <button class="btn btn-sm" data-sort="growth" onclick="sortBy('growth')">Growth</button>
+      <button class="btn btn-sm" data-sort="latest" onclick="sortBy('latest')">Latest</button>
+      <select id="categorySelect" onchange="filterByCategory(this.value)" style="margin-left:auto;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 10px;">
+        <option value="all">All Categories</option>
+      </select>
+    </div>
     <button class="btn btn-refresh" onclick="forceRefresh()" id="refreshBtn">🔄 Refresh</button>
   </div>
 
+  <!-- Top Trending Hero -->
+  <div class="section-title">🔥 Top Trending Now</div>
+  <div class="hero-grid" id="heroGrid">
+    <div class="loading-pulse"></div>
+    <div class="loading-pulse"></div>
+  </div>
+
   <!-- Trends Grid -->
-  <div class="section-title">🔥 Trending Now <span style="font-size:0.75rem;color:var(--text2);font-weight:400" id="trendCount"></span></div>
+  <div class="section-title">📰 All News <span style="font-size:0.75rem;color:var(--text2);font-weight:400" id="trendCount"></span></div>
   <div class="trends-grid" id="trendsGrid">
     <div class="loading-pulse"></div>
     <div class="loading-pulse"></div>
@@ -283,6 +402,11 @@
     <h3>No content ideas yet</h3>
     <p>Content ideas appear when trends score above the minimum threshold. Adjust the score slider or wait for the next refresh.</p>
   </div>
+
+  <!-- Video News Section -->
+  <div class="section-title">📺 News Channels &amp; Live News <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(live TV + official links)</span></div>
+  <div class="video-grid" id="videoGrid"></div>
+  <p class="video-note">Channels are configurable — you can add or swap your preferred news channels anytime.</p>
 </div>
 
 <script>
@@ -291,12 +415,24 @@ let allTrends = [];
 let ideas = [];
 let currentSource = 'all';
 let currentMinScore = 0;
+let currentSort = 'score';
+let currentCategory = 'all';
+
+// ── Auto-refresh config (single central setting) ──
+const AUTO_CFG = {
+  POLL_MS: 60000,       // how often the dashboard checks the server for updates
+  STALE_AFTER_S: 300,   // trigger a real data refresh when cached data is older than this
+  REFRESH_URL: '/api/trends/refresh',
+  REFRESH_TIMEOUT_MS: 90000, // abort a stuck refresh after this
+};
+let isRefreshing = false; // guards manual + automatic refreshes against overlap
+let refreshTimerId = null;
 
 // ── API ──
 async function fetchData() {
   try {
     const [trendsRes, ideasRes, statusRes] = await Promise.all([
-      fetch('/api/trends?limit=60'),
+      fetch('/api/trends?limit=100'),
       fetch('/api/trends/ideas?min_score=40'),
       fetch('/api/trends/status')
     ]);
@@ -307,10 +443,42 @@ async function fetchData() {
     allTrends = trendsData.data || [];
     ideas = ideasData.data || [];
 
+    populateCategories();
     updateUI(trendsData, statusData);
     hideError();
   } catch (e) {
     showError('Cannot connect to pipeline server. Is it running?');
+  }
+}
+
+function populateCategories() {
+  const sel = document.getElementById('categorySelect');
+  const nav = document.getElementById('catNav');
+  // Dedupe case/whitespace-insensitively but keep canonical display names
+  const seen = new Map();
+  allTrends.forEach(t => {
+    const display = String(t.category || 'Technology').trim();
+    const key = normalizeCat(display);
+    if (!seen.has(key)) seen.set(key, display);
+  });
+  const cats = [...seen.values()].sort((a, b) => normalizeCat(a).localeCompare(normalizeCat(b)));
+  if (sel) {
+    sel.innerHTML = '<option value="all">All Categories</option>' +
+      cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    if (currentCategory !== 'all' && [...sel.options].some(o => o.value === currentCategory)) {
+      sel.value = currentCategory; // restore user's selection after data updates
+    }
+  }
+  if (nav) {
+    nav.innerHTML = '<button class="cat-chip active" data-cat="all" onclick="filterByCategory(\'all\')">🔥 All</button>' +
+      cats.map(c => `<button class="cat-chip" data-cat="${escapeHtml(c)}" onclick="filterByCategory('${escapeHtml(c).replace(/'/g, "\\'")}')">${escapeHtml(c)}</button>`).join('');
+    // Restore the active chip highlight after data updates
+    const target = [...nav.querySelectorAll('.cat-chip')].find(b => b.dataset.cat === currentCategory);
+    if (target) target.classList.add('active');
+    else if (!currentCategory || currentCategory === 'all') {
+      const allChip = nav.querySelector('.cat-chip[data-cat="all"]');
+      if (allChip) allChip.classList.add('active');
+    }
   }
 }
 
@@ -347,8 +515,60 @@ function updateUI(trendsData, statusData) {
     showError(`Recent error: ${lastErr.error}`);
   }
 
+  renderHero();
   renderTrends();
   renderIdeas();
+}
+
+// ── Render Top Trending Hero ──
+function _keyPoints(t) {
+  const pts = [];
+  const desc = (t.description || '').trim();
+  if (desc) pts.push(desc.split('.')[0].trim());
+  (t.related_keywords || []).slice(0, 3).forEach(k => pts.push(`Key focus: ${k}`));
+  (t.related_topics || []).slice(0, 2).forEach(tp => pts.push(`Related: ${tp}`));
+  if (t.growth_percentage != null) pts.push(`Growth momentum: ${t.growth_percentage > 0 ? '+' : ''}${t.growth_percentage}%`);
+  return pts.slice(0, 4);
+}
+
+function _trendUrl(t) {
+  return t.url && t.url !== '#' ? t.url : 'https://www.google.com/search?q=' + encodeURIComponent(t.title);
+}
+
+function renderHero() {
+  const grid = document.getElementById('heroGrid');
+  if (!grid) return;
+  const top = [...allTrends].sort((a, b) => (b.trend_score || 0) - (a.trend_score || 0)).slice(0, 3);
+  if (top.length === 0) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="icon">🔥</div><h3>No trending news yet</h3><p>Trends appear once the pipeline fetches data.</p></div>';
+    return;
+  }
+  const [feat, ...rest] = top;
+  const featImg = feat.image_url ? `<img class="hero-img" src="${feat.image_url}" alt="${escapeHtml(feat.title)}" onerror="this.style.display='none'">` : '';
+  const featGrowth = feat.growth_percentage != null ? `<span class="growth-badge ${feat.growth_percentage > 0 ? 'up' : 'down'}">${feat.growth_percentage > 0 ? '+' : ''}${feat.growth_percentage}%</span>` : '';
+  const feature = `
+    <div class="hero-feature">
+      ${featImg}
+      <div class="hero-body">
+        <div class="trend-badges">
+          <span class="category-badge">${escapeHtml(feat.category || 'Technology')}</span>
+          ${featGrowth}
+          <span class="seo-badge">🔥 #1 Hottest</span>
+        </div>
+        <h2><a href="${_trendUrl(feat)}" rel="noopener">${escapeHtml(feat.title)}</a></h2>
+        <ul class="hero-keypoints">${_keyPoints(feat).map(p => `<li>${escapeHtml(p)}</li>`).join('')}</ul>
+      </div>
+    </div>`;
+  const minis = rest.map((t, i) => `
+    <div class="hero-mini">
+      ${t.image_url ? `<img src="${t.image_url}" alt="${escapeHtml(t.title)}" onerror="this.style.display='none'">` : ''}
+      <div class="hm-body">
+        <div class="trend-badges"><span class="category-badge">${escapeHtml(t.category || 'Technology')}</span><span class="seo-badge">#${i + 2}</span></div>
+        <h3><a href="${_trendUrl(t)}" rel="noopener">${escapeHtml(t.title)}</a></h3>
+        <p>${escapeHtml((t.description || '').slice(0, 110))}</p>
+      </div>
+    </div>`).join('');
+  grid.innerHTML = feature + '<div class="hero-side">' + minis + '</div>';
 }
 
 // ── Render Trends ──
@@ -360,8 +580,20 @@ function renderTrends() {
   if (currentSource !== 'all') {
     filtered = filtered.filter(t => (t.sources || []).includes(currentSource));
   }
+  if (currentCategory !== 'all') {
+    const norm = normalizeCat(currentCategory);
+    filtered = filtered.filter(t => normalizeCat(t.category || 'Technology') === norm);
+  }
   filtered = filtered.filter(t => t.trend_score >= currentMinScore);
-  filtered = filtered.slice(0, 60);
+
+  // Sort
+  const sorter = {
+    score: (a, b) => (b.trend_score || 0) - (a.trend_score || 0),
+    seo: (a, b) => (b.seo_score || 0) - (a.seo_score || 0),
+    growth: (a, b) => (b.growth_percentage || -1) - (a.growth_percentage || -1),
+    latest: (a, b) => (b.published_at || '').localeCompare(a.published_at || ''),
+  };
+  filtered = [...filtered].sort(sorter[currentSort] || sorter.score).slice(0, 60);
 
   countEl.textContent = `(${filtered.length} items)`;
 
@@ -370,23 +602,35 @@ function renderTrends() {
       <div class="empty-state" style="grid-column:1/-1;">
         <div class="icon">🔍</div>
         <h3>No trends match your filters</h3>
-        <p>Try lowering the minimum score or selecting a different source.</p>
+        <p>Try lowering the minimum score or selecting a different category.</p>
       </div>`;
     return;
   }
 
   grid.innerHTML = filtered.map(t => {
     const sources = (t.sources || [t.source || '']).filter(Boolean);
-    const badgeHtml = sources.map(s => 
+    const pubBadge = t.publisher ? `<span class="publisher-badge">${escapeHtml(t.publisher)}</span>` : '';
+    const badgeHtml = pubBadge + sources.map(s => 
       `<span class="source-badge ${s}">${s.replace('_',' ')}</span>`
     ).join('');
+    const cat = t.category || 'Technology';
+    const growth = t.growth_percentage != null ? `<span class="growth-badge ${t.growth_percentage > 0 ? 'up' : 'down'}">${t.growth_percentage > 0 ? '+' : ''}${t.growth_percentage}%</span>` : '';
+    const seo = t.seo_score != null ? `<span class="seo-badge" title="SEO potential">SEO ${t.seo_score}</span>` : '';
+    const kws = (t.related_keywords || []).slice(0, 5).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('');
+    const img = t.image_url ? `<img class="trend-img" src="${t.image_url}" alt="${escapeHtml(t.title)}" loading="lazy" onerror="this.style.display='none'">` : '';
 
     return `
-      <div class="trend-card">
+      <div class="trend-card" data-rank="${t.rank}">
+        ${img}
+        <div class="trend-badges">
+          <span class="category-badge">${escapeHtml(cat)}</span>
+          ${growth}
+          ${seo}
+        </div>
         <span class="trend-rank ${t.rank <= 3 ? 'top' : ''}">#${t.rank}</span>
         <span class="trend-score">${t.trend_score}</span>
         <div class="trend-title">
-          ${t.url ? `<a href="${t.url}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a>` : escapeHtml(t.title)}
+          ${(() => { const url = t.url && t.url !== '#' ? t.url : 'https://www.google.com/search?q=' + encodeURIComponent(t.title); return `<a href="${url}" rel="noopener">${escapeHtml(t.title)}</a>`; })()}
         </div>
         <div class="trend-meta">
           ${badgeHtml}
@@ -394,6 +638,14 @@ function renderTrends() {
           ${t.published_at ? `<span>${formatDate(t.published_at)}</span>` : ''}
         </div>
         ${t.description ? `<div class="trend-description">${escapeHtml(t.description)}</div>` : ''}
+        ${kws ? `<div class="trend-keywords">${kws}</div>` : ''}
+        <div class="trend-actions">
+          <button class="action-btn" onclick="viewDetails(${t.rank})">👁 Details</button>
+          <button class="action-btn" onclick="generateArticle(${t.rank})">📝 Article</button>
+          <button class="action-btn" onclick="generateSocial(${t.rank})">📣 Post</button>
+          <button class="action-btn ${t.saved ? 'saved' : ''}" id="save-${t.rank}" onclick="saveTrend(${t.rank})">${t.saved ? '★ Saved' : '☆ Save'}</button>
+          <button class="action-btn dismiss" onclick="dismissTrend(${t.rank})">✕ Dismiss</button>
+        </div>
       </div>`;
   }).join('');
 }
@@ -447,19 +699,191 @@ function filterByScore(val) {
   renderTrends();
 }
 
-// ── Actions ──
-async function forceRefresh() {
-  const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ Refreshing…';
-  try {
-    await fetch('/api/trends/refresh');
-    await fetchData();
-  } catch (e) {
-    showError('Refresh failed. Check server logs.');
+// ── Sort & category filter ──
+function sortBy(sort) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-row .btn[data-sort]').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.sort-row .btn[data-sort="${sort}"]`).classList.add('active');
+  renderTrends();
+}
+
+function filterByCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.cat-chip[data-cat]').forEach(b => b.classList.remove('active'));
+  const chip = document.querySelector(`.cat-chip[data-cat="${cat}"]`);
+  if (chip) chip.classList.add('active');
+  const sel = document.getElementById('categorySelect');
+  if (sel && [...sel.options].some(o => o.value === cat)) sel.value = cat;
+  renderTrends();
+}
+
+// ── Trend actions ──
+function _findTrend(rank) {
+  return allTrends.find(t => t.rank === rank);
+}
+
+function showModal(title, bodyHtml) {
+  let modal = document.getElementById('trendModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'trendModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-head"><h3 id="modalTitle"></h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>`;
+    document.body.appendChild(modal);
   }
-  btn.disabled = false;
-  btn.textContent = '🔄 Refresh';
+  modal.style.display = 'flex';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+}
+
+function closeModal() {
+  const m = document.getElementById('trendModal');
+  if (m) m.style.display = 'none';
+}
+
+function viewDetails(rank) {
+  const t = _findTrend(rank);
+  if (!t) return;
+  showModal(t.title, `
+    <p style="margin:0 0 10px;">${escapeHtml(t.description || 'No description')}</p>
+    <div class="detail-grid">
+      <div><strong>Category</strong><br>${escapeHtml(t.category || '—')}</div>
+      <div><strong>Trend Score</strong><br>${t.trend_score}</div>
+      <div><strong>SEO Score</strong><br>${t.seo_score ?? '—'}</div>
+      <div><strong>Growth</strong><br>${t.growth_percentage != null ? (t.growth_percentage > 0 ? '+' : '') + t.growth_percentage + '%' : '—'}</div>
+      <div><strong>Region</strong><br>${escapeHtml(t.region || '—')}</div>
+      <div><strong>Language</strong><br>${escapeHtml(t.language || '—')}</div>
+    </div>
+    <div style="margin-top:12px;"><strong>Related keywords:</strong> ${(t.related_keywords || []).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('') || '—'}</div>
+    <div style="margin-top:8px;"><strong>Related topics:</strong> ${(t.related_topics || []).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('') || '—'}</div>
+    <div style="margin-top:12px;"><strong>Source:</strong> <a href="${escapeHtml(t.url)}" rel="noopener">${escapeHtml(t.url)}</a></div>
+    <div style="margin-top:8px;color:var(--text2);font-size:0.8rem;">Image: ${escapeHtml(t.image_source || '—')} · ${escapeHtml(t.image_license || '—')} · Retrieved ${escapeHtml(t.retrieved_at || '—')}</div>
+  `);
+}
+
+async function generateArticle(rank) {
+  const t = _findTrend(rank);
+  if (!t) return;
+  showModal(`📝 Article — ${t.title}`, '<p style="color:var(--text2)">Generating article brief…</p>');
+  try {
+    const r = await fetch(`/api/trends/${rank}/article`);
+    const d = await r.json();
+    const a = d.article;
+    document.getElementById('modalBody').innerHTML = `
+      <p><strong>Meta title:</strong> ${escapeHtml(a.meta_title)}</p>
+      <p><strong>Meta description:</strong> ${escapeHtml(a.meta_description)}</p>
+      <p><strong>Target keywords:</strong> ${(a.target_keywords || []).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('')}</p>
+      <p><strong>Outline:</strong></p>
+      <ol style="margin:0 0 10px 20px;line-height:1.7;">${(a.outline || []).map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+      <p><strong>FAQ:</strong></p>
+      ${(a.faq || []).map(f => `<p style="margin:4px 0;"><strong>Q:</strong> ${escapeHtml(f.q)}<br><strong>A:</strong> ${escapeHtml(f.a)}</p>`).join('')}
+    `;
+  } catch (e) {
+    document.getElementById('modalBody').innerHTML = '<p>Failed to generate article.</p>';
+  }
+}
+
+async function generateSocial(rank) {
+  const t = _findTrend(rank);
+  if (!t) return;
+  showModal(`📣 Social Post — ${t.title}`, '<p style="color:var(--text2)">Generating social post…</p>');
+  try {
+    const r = await fetch(`/api/trends/${rank}/social`);
+    const d = await r.json();
+    const s = d.social;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="social-post">${escapeHtml(s.post).replace(/\n/g, '<br>')}</div>
+      <p style="margin-top:10px;"><strong>Hashtags:</strong> ${(s.hashtags || []).map(h => `<span class="kw-chip">${escapeHtml(h)}</span>`).join('')}</p>
+      <p><strong>CTA:</strong> ${escapeHtml(s.cta)}</p>
+      <button class="action-btn" onclick="navigator.clipboard.writeText(document.querySelector('.social-post').textContent)">📋 Copy</button>
+    `;
+  } catch (e) {
+    document.getElementById('modalBody').innerHTML = '<p>Failed to generate social post.</p>';
+  }
+}
+
+async function saveTrend(rank) {
+  const t = _findTrend(rank);
+  if (!t) return;
+  try {
+    await fetch(`/api/trends/${rank}/save`, { method: 'POST' });
+    t.saved = true;
+    renderTrends();
+  } catch (e) {
+    showError('Save failed.');
+  }
+}
+
+async function dismissTrend(rank) {
+  const t = _findTrend(rank);
+  if (!t) return;
+  try {
+    await fetch(`/api/trends/${rank}/dismiss`, { method: 'POST' });
+    t.dismissed = true;
+    allTrends = allTrends.filter(x => x.rank !== rank);
+    renderTrends();
+  } catch (e) {
+    showError('Dismiss failed.');
+  }
+}
+
+// ── Actions ──
+async function refreshData() {
+  // Single shared refresh path (manual button + automatic ticks).
+  if (isRefreshing) return false; // never overlap refreshes
+  isRefreshing = true;
+  const btn = document.getElementById('refreshBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Refreshing…'; btn.setAttribute('aria-busy', 'true'); }
+  hideError();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), AUTO_CFG.REFRESH_TIMEOUT_MS);
+  try {
+    const res = await fetch(AUTO_CFG.REFRESH_URL, { signal: ctrl.signal });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const body = await res.json().catch(() => ({}));
+    if (body.status === 'error') throw new Error(body.message || 'Refresh failed');
+    await fetchData();
+    return true;
+  } catch (e) {
+    const timedOut = e.name === 'AbortError';
+    showError('Refresh ' + (timedOut ? 'timed out' : 'failed') +
+      '. Showing latest cached data — try again.');
+    // Keep the UI fresh with whatever the server still has
+    try { await fetchData(); } catch (_) {}
+    return false;
+  } finally {
+    clearTimeout(timer);
+    isRefreshing = false;
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh'; btn.removeAttribute('aria-busy'); }
+  }
+}
+
+async function forceRefresh() {
+  await refreshData();
+}
+
+// ── Automatic update tick: poll cheaply; fetch new data only when stale ──
+async function autoTick() {
+  try {
+    const statusRes = await fetch('/api/trends/status');
+    if (!statusRes.ok) throw new Error('HTTP ' + statusRes.status);
+    const statusData = await statusRes.json();
+    const age = statusData.age_seconds;
+    const needFresh = statusData.data_available === false ||
+                      (age != null && age > AUTO_CFG.STALE_AFTER_S);
+    if (needFresh) {
+      await refreshData(); // pulls new trends into cache + re-renders hero/cards
+    } else {
+      await fetchData();   // cheap cache re-read keeps UI in sync
+    }
+  } catch (e) {
+    // Backend unreachable (e.g. static preview) — keep UI working with sample data
+    try { await fetchData(); } catch (_) {}
+  }
 }
 
 // ── Error handling ──
@@ -474,6 +898,26 @@ function hideError() {
 }
 
 // ── Utilities ──
+function normalizeCat(cat) {
+  const s = String(cat || 'Technology').trim().replace(/\s+/g, ' ').toLowerCase();
+  // Mirror of the server-side alias map (defense in depth)
+  const aliases = {
+    'artificial intelligence': 'ai', 'machine learning': 'ai', 'generative ai': 'ai',
+    'cyber security': 'cybersecurity',
+    'startup': 'startups & funding', 'funding': 'startups & funding', 'venture': 'startups & funding',
+    'web3': 'crypto & web3', 'blockchain': 'crypto & web3',
+    'hardware': 'gadgets & hardware', 'devices': 'gadgets & hardware',
+    'development': 'software & dev', 'developers': 'software & dev',
+    'seo': 'marketing & seo',
+    'finance': 'business & finance', 'fintech': 'business & finance',
+    'climate': 'energy & climate',
+    'health': 'science & health', 'medical': 'science & health',
+    'mobility': 'auto & mobility',
+    'tech': 'technology', 'general': 'technology', 'misc': 'technology', 'other': 'technology', 'news': 'technology',
+  };
+  return aliases[s] || s;
+}
+
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
@@ -488,9 +932,130 @@ function formatDate(iso) {
   } catch { return iso.slice(0,10); }
 }
 
+// ── Subscription ──
+function openSubscription() {
+  const o = document.getElementById('subOverlay');
+  if (o) o.style.display = 'flex';
+}
+
+function closeSubscription() {
+  const o = document.getElementById('subOverlay');
+  if (o) o.style.display = 'none';
+}
+
+function submitSubscription(e) {
+  e.preventDefault();
+  const email = document.getElementById('subEmail').value.trim();
+  const msg = document.getElementById('subMsg');
+  const btn = document.getElementById('subBtn');
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!valid) {
+    msg.textContent = 'Please enter a valid email address.';
+    msg.className = 'sub-msg err';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Subscribing…';
+  try {
+    // Store locally (client-side persistence); swap for a real API/webhook later
+    const subs = JSON.parse(localStorage.getItem('db_subscribers') || '[]');
+    if (!subs.includes(email)) subs.push(email);
+    localStorage.setItem('db_subscribers', JSON.stringify(subs));
+    msg.textContent = '✅ Subscribed! You\'ll get the top trends daily.';
+    msg.className = 'sub-msg ok';
+    setTimeout(closeSubscription, 1600);
+  } catch (err) {
+    msg.textContent = 'Subscription failed. Please try again.';
+    msg.className = 'sub-msg err';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Subscribe Free';
+}
+
+function scheduleSubscription() {
+  if (localStorage.getItem('db_sub_seen')) return;
+  setTimeout(() => { openSubscription(); localStorage.setItem('db_sub_seen', '1'); }, 12000);
+}
+
+// ── Video News ──
+const NEWS_CHANNELS = [
+  { name: 'NDTV', region: 'India', website: 'https://www.ndtv.com', youtube: 'UCZFMm1mMw0F81Z37aaEzTUA', embed: 'youtube' },
+  { name: 'BBC News', region: 'UK', website: 'https://www.bbc.com/news', youtube: 'UC16niRr50-MSBwiO3YDb3RA', embed: 'youtube' },
+  { name: 'Al Jazeera English', region: 'Global', website: 'https://www.aljazeera.com/live/', youtube: 'UCNye-wNBqNL5ZzHSJj3l8Bg', embed: 'youtube' },
+  { name: 'France 24 English', region: 'France · Global', website: 'https://www.france24.com/en/live', youtube: 'UCQfwfsi5VrQ8yKZ-UWmAEFg', embed: 'youtube' },
+  { name: 'DW News', region: 'Germany · Global', website: 'https://www.dw.com/en/top-stories/s-9097', youtube: 'UCknLrEdhRCp1aegoMqRaCZg', embed: 'youtube' },
+  { name: 'WION', region: 'India · Global', website: 'https://www.wionews.com', youtube: 'UC_gUM8rL-Lrg6O3adPW9K1g', embed: 'youtube' },
+  { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'youtube' },
+  { name: 'The Indian Express', region: 'India', website: 'https://indianexpress.com', youtube: 'UCJEDFSxHHOW1PpBccdSxOTA', embed: 'youtube' },
+  { name: 'News18 India', region: 'India', website: 'https://www.news18.com', youtube: 'UCPP3etACgdUWvizcES1dJ8Q', embed: 'youtube' },
+  { name: 'Euronews', region: 'Europe · Global', website: 'https://www.euronews.com', youtube: 'UCSrZ3UV4jOidv8ppoVuvW9Q', embed: 'youtube' },
+  { name: 'Sky News', region: 'UK', website: 'https://news.sky.com', youtube: 'UCoMdktPbSTixAyNGwb-UYkQ', embed: 'link', note: 'Sky News restricts live-stream embedding — watch on the official site or YouTube.' },
+  { name: 'Reuters', region: 'Global', website: 'https://www.reuters.com', youtube: 'UChqUTb7kYRX8-EiaN3XFrSQ', embed: 'link', note: 'Reuters video is licensed — watch on the official site or YouTube.' },
+  { name: 'Times of India', region: 'India', website: 'https://timesofindia.indiatimes.com', youtube: '', embed: 'link', note: 'Times of India offers RSS headlines (integrated in the news feed above) — visit the official site.' },
+];
+
+// Single edit point for the live-news section: add/swap channels here.
+function renderNewsChannels() {
+  const grid = document.getElementById('videoGrid');
+  if (!grid) return;
+  grid.innerHTML = NEWS_CHANNELS.map(ch => {
+    if (ch.embed === 'youtube' && ch.youtube) {
+      return '<div class="video-card">' +
+        '<div class="video-head">' +
+          '<span class="video-live">● LIVE</span>' +
+          '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
+          '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
+        '</div>' +
+        '<div class="video-embed">' +
+          '<iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + ch.youtube + '&autoplay=1&mute=1"' +
+          ' title="' + escapeHtml(ch.name) + ' live news" frameborder="0" allowfullscreen' +
+          ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+          ' loading="lazy"></iframe>' +
+        '</div>' +
+        '<div class="video-actions">' +
+          '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube ↗</a>' +
+          (ch.website ? '<a class="video-watch" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Website ↗</a>' : '') +
+        '</div>' +
+      '</div>';
+    }
+    // Link card — embedding blocked/unsupported by the source's security policy (never bypassed)
+    return '<div class="video-card link-card">' +
+      '<div class="video-head">' +
+        '<span class="video-live off">●</span>' +
+        '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
+        '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
+      '</div>' +
+      '<div class="video-link-body">' +
+        '<p>' + escapeHtml(ch.note || 'Watch on the official channel website.') + '</p>' +
+        '<div class="video-actions">' +
+          (ch.website ? '<a class="action-btn" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Official Site ↗</a>' : '') +
+          (ch.youtube ? '<a class="action-btn" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube ↗</a>' : '') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
 // ── Init ──
+renderNewsChannels();
 fetchData();
-setInterval(fetchData, 60000); // Auto-refresh UI every 60s
+refreshTimerId = setInterval(autoTick, AUTO_CFG.POLL_MS); // auto-update (manual + auto share one guard)
+scheduleSubscription();
 </script>
+
+<!-- Subscription Popup -->
+<div class="sub-overlay" id="subOverlay" role="dialog" aria-modal="true" aria-label="Subscribe to trending news">
+  <div class="sub-box">
+    <div class="sub-emoji">📬</div>
+    <h3>Stay Ahead of the Trends</h3>
+    <p>Get the hottest trending news, AI insights, and market moves delivered to your inbox daily.</p>
+    <form id="subForm" onsubmit="submitSubscription(event)">
+      <input type="email" id="subEmail" placeholder="your@email.com" required aria-label="Email address">
+      <button type="submit" class="sub-btn" id="subBtn">Subscribe Free</button>
+      <button type="button" class="sub-later" onclick="closeSubscription()">No thanks, maybe later</button>
+      <div class="sub-msg" id="subMsg"></div>
+    </form>
+  </div>
+</div>
 </body>
 </html>

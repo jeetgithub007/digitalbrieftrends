@@ -1,84 +1,73 @@
+"""Google Trends fetcher — real-time daily trending topics.
+
+Uses Google's official daily-trending RSS feed (pytrends' "trending now"
+endpoints were deprecated and return 404). Each topic links to Google News
+so users land on REAL articles, never the Google Trends explore page.
 """
-Google Trends Fetcher (pytrends)
-Handles rate limiting, regional data, suggestions.
-"""
-import time
-import logging
-from pytrends.request import TrendReq
+import asyncio, logging
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
-logger = logging.getLogger("trend-pipeline.google_trends")
+logger = logging.getLogger("trends.google")
 
-class GoogleTrendsFetcher:
-    def __init__(self, proxy=None):
-        self.proxy = proxy
-        self._pt = None
+TRENDING_RSS = {
+    "India": "https://trends.google.com/trending/rss?geo=IN",
+    "United States": "https://trends.google.com/trending/rss?geo=US",
+}
 
-    @property
-    def pt(self):
-        """Lazy init — only connect when needed."""
-        if self._pt is None:
-            logger.info("Connecting to Google Trends...")
-            kw = dict(hl="en-US", tz=330)
-            if self.proxy:
-                kw["proxies"] = [self.proxy]
-            self._pt = TrendReq(**kw)
-        return self._pt
 
-    def fetch_suggestions(self, keywords):
-        """Auto-complete suggestions for content ideas."""
-        results = {}
-        for kw in keywords:
-            try:
-                sug = self.pt.suggestions(kw)
-                results[kw] = [s["title"] for s in sug[:6]]
-                time.sleep(2)
-            except Exception as e:
-                logger.warning(f"suggestions({kw}): {e}")
-                results[kw] = []
-                time.sleep(5)
-        return results
+def _news_url(query):
+    """Link to real news articles about a topic (Google News search)."""
+    return f"https://news.google.com/search?q={quote(query)}&hl=en-IN&gl=IN&ceid=IN:en"
 
-    def fetch_regional(self, keywords, geo="IN"):
-        """Regional interest by Indian state for target keywords."""
-        results = {}
-        for kw in keywords:
-            try:
-                self.pt.build_payload([kw], timeframe="today 12-m", geo=geo)
-                reg = self.pt.interest_by_region(resolution="REGION")
-                if not reg.empty:
-                    results[kw] = [
-                        {"region": idx, "score": int(row[kw])}
-                        for idx, row in reg.sort_values(kw, ascending=False).head(5).iterrows()
-                    ]
-                time.sleep(4)
-            except Exception as e:
-                logger.warning(f"regional({kw}): {e}")
-                results[kw] = []
-                time.sleep(6)
-        return results
 
-    def fetch_interest(self, keywords, timeframe="today 1-m"):
-        """Interest-over-time: trend direction and peaks."""
-        results = {}
-        batch_size = 5
-        for i in range(0, len(keywords), batch_size):
-            batch = keywords[i:i + batch_size]
-            try:
-                self.pt.build_payload(batch, timeframe=timeframe)
-                iot = self.pt.interest_over_time()
-                if not iot.empty:
-                    for kw in batch:
-                        if kw in iot.columns:
-                            vals = iot[kw].dropna()
-                            if len(vals) > 1:
-                                results[kw] = {
-                                    "avg": round(float(vals.mean()), 1),
-                                    "peak": int(vals.max()),
-                                    "latest": int(vals.iloc[-1]),
-                                    "trend": "UP" if vals.iloc[-1] > vals.iloc[0] else "DOWN",
-                                }
-                time.sleep(5)
-            except Exception as e:
-                logger.warning(f"interest batch {i}: {e}")
-                time.sleep(8)
-        return results
+def _fetch_feed(url):
+    import feedparser
+    req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; DigitalBrief/1.0)"})
+    raw = urlopen(req, timeout=15).read()
+    return feedparser.parse(raw)
+
+
+def _real_description(entry):
+    """Extract a real news headline about the topic (factual, not fabricated)."""
+    for item in entry.get("ht_news_item", []) or []:
+        title = (item.get("title") or "").strip()
+        if title and len(title) > 20:
+            return title
+    return ""
+
+
+def _is_english(text):
+    """Keep only Latin-script (English) topics; skip regional-language trends."""
+    ascii_chars = sum(1 for ch in text if ord(ch) < 128)
+    return ascii_chars / max(1, len(text)) > 0.85
+
+
+async def fetch_google_trends(keywords):
+    loop = __import__("asyncio").get_event_loop()
+    return await loop.run_in_executor(None, _sync_fetch)
+
+
+def _sync_fetch():
+    items = []
+    seen = set()
+    for region, url in TRENDING_RSS.items():
+        try:
+            feed = _fetch_feed(url)
+            for e in feed.entries:
+                title = (e.get("title") or "").strip()
+                if title and len(title) > 2 and title.lower() not in seen and _is_english(title):
+                    seen.add(title.lower())
+                    items.append({
+                        "title": title,
+                        "url": _news_url(title),
+                        "source": "google_trends",
+                        "region": region,
+                        "description": _real_description(e),
+                        "search_volume": 0,
+                    })
+            logger.info(f"Google Trends/{region}: {len(feed.entries)} trending topics")
+        except Exception as err:
+            logger.warning(f"Google Trends/{region}: {err}")
+    logger.info(f"Google Trends: {len(items)} real-time topics")
+    return items

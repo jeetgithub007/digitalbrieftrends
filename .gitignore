@@ -3,38 +3,22 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 dist/
-*.egg
 .venv/
-venv/
 
-# Secrets & Environment
+# Secrets
 .env
 *.local
-secrets.*
-credentials.*
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Project specific
-trends_output.json
-*.log
-run_pipeline_now.py
-test_api.py
-test_server.py
-validate_apis.py
-verify_rss.py
-audit_seo.py
-
 # Vercel
 .vercel/
 
-# Projects (Function Compute deployment artifacts)
-projects/
+# Output
+*.log

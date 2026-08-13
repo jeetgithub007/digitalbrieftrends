@@ -1,8 +1,89 @@
-# Trend Pipeline
+# Trend Pipeline — Trend Intelligence & Content Enrichment System
 
-Multi-source trend aggregation service — fetches trending topics from Google Trends, NewsAPI, Reddit, and RSS feeds, deduplicates, scores, and serves them via a REST API and live dashboard.
+Multi-source trend aggregation with intelligent enrichment — fetches trending topics
+from Google Trends, NewsAPI, Mediastack, GNews, Currents, Reddit, and RSS feeds,
+deduplicates, scores, **enriches** each trend (category, growth, description, image,
+related keywords/topics, SEO score), and serves everything via a REST API + live dashboard.
 
 Built for **DigitalBrief** and **Jeet Digital Marketing Agency**.
+
+---
+
+## Recent Fixes (2026-08-13) — India RSS Feeds & Live News Channels
+
+### 1. India news feeds integrated (10 new RSS sources)
+- Added **BBC India, The Hindu, NDTV, India Today, Times of India, Indian Express,
+  ThePrint, Hindustan Times, Business Standard, The Guardian India** to a structured
+  `RSS_SOURCES` config (18 feeds total: 8 tech + 10 India) in `core/config.py`.
+- RSS fetcher upgraded (`fetchers/rss.py`): browser User-Agent fetch + `feedparser.parse(string)`
+  (fixes Business Standard 403-class blocks), per-item `publisher` attribution, image fallbacks
+  (media_thumbnail → media_content → enclosure → itunes:image → first `<img>`), `updated_parsed`
+  fallback, per-feed timeout, gentle 1s delay between feeds.
+- New **India News** category rules (india/delhi/mumbai/kashmir/isro/lok sabha/rupee/sensex/
+  bjp/ipl/bollywood …) + `india news` alias in `normalize_category()` — category filter now
+  matches reliably.
+- Aggregator recency tie-break: on equal scores, newer items surface first.
+- 123+ RSS items per refresh → 130+ unique enriched trends; publishers shown as badges on cards.
+
+### 2. Live News Channels section (13 channels)
+- New **News Channels & Live News** section on the dashboard: 10 embeddable 24/7 live channels
+  (NDTV, BBC News, Al Jazeera English, France 24, DW News, **WION**, **India Today**, Indian
+  Express, News18, Euronews) + 3 official-site link cards (Sky News, Reuters, Times of India —
+  embedding blocked/licensed, never bypassed).
+- Embed pattern: `https://www.youtube-nocookie.com/embed/live_stream?channel=<UC-ID>&autoplay=1&mute=1`
+  (privacy-enhanced, muted autoplay per browser policy) with "Watch on YouTube ↗" fallback.
+- Channel IDs verified via YouTube RSS title check; `/api/channels` endpoint exposes the registry
+  with sanitized URLs (http/https only, `UC\w{22}` ID validation).
+- Channels are configurable from the `NEWS_CHANNELS` array (single edit point).
+
+---
+
+## Recent Fixes (2026-08-13) — Filtering, Refresh & Auto-Update
+
+### 1. Category filtering made reliable
+- **Root cause:** category values were compared with exact string equality; no
+  normalization existed for case/whitespace/naming variants, and the filter UI
+  state (active chip/select) was lost on every 60s data poll.
+- **Fix:** new `normalize_category()` in `core/enrichment.py` (alias map +
+  whitespace/case normalization) applied at enrichment time, at the API boundary
+  (`_serialize_trend`), and in the `/api/trends/enriched` filter; frontend
+  `normalizeCat()` mirrors the alias map; chips/select are deduped
+  case-insensitively and the active filter is restored after every data update.
+- Selecting any category now shows only matching news; **All Categories**
+  restores the full feed; filters survive fetch/refresh/poll cycles.
+
+### 2. Refresh button — full pipeline refresh
+- **Root cause:** no concurrency guard (manual refresh could overlap the 30-min
+  background loop), no request timeout (a slow pipeline left the button stuck),
+  and a refresh yielding 0 trends called `cache.update([])` and wiped the feed.
+- **Fix:** `asyncio.Lock` in `core/engine.py` serializes ALL pipeline runs
+  (background loop, manual refresh, auto refresh); a 0-trend refresh now keeps
+  the previous data and surfaces a visible error; frontend `refreshData()`
+  guards double-clicks, times out after 90s, shows a loading state, and renders
+  the latest cached data on failure — no browser reload needed.
+
+### 3. Top Trending auto-update
+- **Root cause:** the 60s poll only re-read the cache; new trends only arrived
+  when the 30-min backend loop happened to run.
+- **Fix:** central `AUTO_CFG` (POLL_MS / STALE_AFTER_S / REFRESH_URL) — the
+  dashboard checks every 60s and triggers a real pipeline refresh when data is
+  missing or older than 5 minutes, then re-renders hero + cards automatically.
+  Manual and automatic refreshes share one guarded path, so they never conflict.
+
+# Recent Fixes (2026-08-12)
+
+1. **Real news now ranks first.** RSS feeds (real articles) carry the highest source
+   weight (`40`); Google Trends topics are demoted (`12`) so real reporting leads the
+   dashboard instead of search-term suggestions.
+2. **No more Google Trends redirects.** Google Trends topics now link to **Google News**
+   search (`news.google.com/search?q=…`) — real articles, never the `trends.google.com`
+   explore page.
+3. **Live current topics, not evergreen.** The Google Trends fetcher now uses Google's
+   official **daily-trending RSS feed** (pytrends' "trending now" endpoints are
+   deprecated and return 404), returning real-time topics like today's news and events.
+4. **Factual descriptions only.** RSS descriptions are extracted from the real article
+   summary (via `feedparser`); search topics get a clearly-labelled factual note — no
+   fabricated or AI-generated news copy.
 
 ---
 
@@ -11,33 +92,38 @@ Built for **DigitalBrief** and **Jeet Digital Marketing Agency**.
 ```powershell
 cd trend-pipeline
 pip install -r requirements.txt
-python server.py
+python api/index.py
 ```
 
-Then open **http://localhost:8765** for the dashboard.
+Then open:
+- **http://localhost:8765** — landing page
+- **http://localhost:8765/dashboard** — enriched trend dashboard
+- **http://localhost:8765/docs** — Swagger API docs
 
 ---
 
 ## Architecture
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                    TREND PIPELINE                       │
-├──────────┬──────────┬──────────┬───────────────────────┤
-│ Google   │ NewsAPI  │  Reddit  │  RSS Feeds            │
-│ Trends   │ (80K+    │ (r/tech  │  (TechCrunch,         │
-│ (pytrends│  sources)│  r/ai…)  │   Verge, Ars, HN…)   │
-├──────────┴──────────┴──────────┴───────────────────────┤
-│              Trend Aggregator Engine                    │
-│    Merge → Deduplicate → Score → Rank → Cache          │
-├────────────────────────────────────────────────────────┤
-│              REST API (FastAPI)                         │
-│    GET /api/trends  GET /api/trends/top               │
-│    GET /api/trends/ideas  GET /api/trends/status      │
-├────────────────────────────────────────────────────────┤
-│              Dashboard (HTML)                           │
-│    Real-time filters, scoring, content ideas           │
-└────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                      TREND PIPELINE                           │
+├──────────┬──────────┬──────────┬──────────┬──────────────────┤
+│ Google   │ NewsAPI  │ Reddit   │ RSS      │ Mediastack/GNews │
+│ Trends   │          │          │ (8 feeds)│  /Currents       │
+├──────────┴──────────┴──────────┴──────────┴──────────────────┤
+│              Aggregator (merge → dedup → score → rank)       │
+├───────────────────────────────────────────────────────────────┤
+│         ENRICHMENT LAYER  (additive, non-breaking)           │
+│   category · growth · description · image · keywords · SEO   │
+├───────────────────────────────────────────────────────────────┤
+│              Cache (in-memory + save/dismiss state)          │
+├───────────────────────────────────────────────────────────────┤
+│              REST API (FastAPI)                               │
+│   /api/trends · /enriched · /article · /social · save/dismiss│
+├───────────────────────────────────────────────────────────────┤
+│              Dashboard (HTML, dark theme, responsive)         │
+│   filters · sort · category · actions (Details/Article/Post) │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -46,37 +132,40 @@ Then open **http://localhost:8765** for the dashboard.
 
 | File | Purpose |
 |------|---------|
-| `server.py` | FastAPI server — REST API + dashboard + pipeline orchestration |
-| `engine.py` | Pipeline engine — coordinates all fetchers, refresh loop |
-| `aggregator.py` | Merges, deduplicates, scores, and ranks trends |
-| `cache.py` | Thread-safe in-memory cache |
-| `config.py` | All configuration — API keys, keywords, intervals |
-| `fetchers/google_trends.py` | pytrends: suggestions, regional, interest data |
-| `fetchers/newsapi.py` | NewsAPI: headlines from 80K+ sources |
-| `fetchers/reddit.py` | Reddit: hot posts from configured subreddits |
-| `fetchers/rss.py` | RSS: entries from major tech/business publications |
-| `dashboard.html` | Self-contained dashboard UI |
+| `api/index.py` | Unified entry point — pages + all REST API + actions |
+| `core/engine.py` | Pipeline orchestrator — fetches, aggregates, enriches, caches |
+| `core/aggregator.py` | Merge, deduplicate, score, rank + content ideas |
+| `core/enrichment.py` | **NEW** — category, growth, description, image, keywords, SEO, article/social |
+| `core/cache.py` | Thread-safe cache + save/dismiss state |
+| `core/config.py` | All config — API keys, keywords, feeds, intervals |
+| `fetchers/google_trends.py` | Real-time trending topics via Google's daily-trending RSS feed |
+| `fetchers/rss.py` | Real articles + real description/image extraction |
+| `dashboard.html` | Enriched dashboard UI |
+| `landing.html` | SEO landing page |
+| `static/favicon.svg` | Custom favicon |
+| `vercel.json` / `.vercelignore` | Vercel deployment config |
 
 ---
 
-## API Keys Needed
+## Enrichment Fields (per trend)
 
-| Service | Required? | Signup Link | Free Tier |
-|---------|-----------|-------------|-----------|
-| Google Trends | No | None | Always free |
-| NewsAPI | Recommended | https://newsapi.org/register | 100 req/day |
-| Reddit | Recommended | https://www.reddit.com/prefs/apps | Free (script app) |
-| RSS Feeds | No | None | Always free |
+Every fetched trend is enriched with these **optional** fields (missing data is handled gracefully):
 
-**Without NewsAPI/Reddit keys:** The pipeline still runs — those sources are simply skipped. You'll get Google Trends + RSS data.
+| Field | Description |
+|-------|-------------|
+| `category` | Auto-categorized (AI, Cybersecurity, Gadgets, Startups, …) |
+| `growth_percentage` | Estimated growth (from real signal or score heuristic) |
+| `description` | Concise factual description (30–80 words) |
+| `image_url` / `image_source` / `image_license` | Category-themed featured image (SVG data URI) |
+| `related_keywords` | Extracted for SEO/content |
+| `related_topics` | Related subjects per category |
+| `seo_score` | 0–100 content/SEO potential |
+| `region` / `language` | Region and language metadata |
+| `retrieved_at` | UTC timestamp |
 
-Set keys via environment variables or edit `config.py`:
-
-```powershell
-$env:NEWSAPI_KEY = "your_key"
-$env:REDDIT_CLIENT_ID = "your_id"
-$env:REDDIT_CLIENT_SECRET = "your_secret"
-```
+### Content generation
+- **Article brief** — meta title/description, target keywords, outline, FAQ
+- **Social post** — hook, body, hashtags, CTA, image
 
 ---
 
@@ -84,116 +173,67 @@ $env:REDDIT_CLIENT_SECRET = "your_secret"
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /` | Dashboard (HTML) |
-| `GET /docs` | Swagger API docs |
-| `GET /api/trends` | All trends (filterable: `?source=` `&min_score=` `&limit=` `&category=`) |
+| `GET /api/trends` | All trends (enriched). Filters: `?source=` `&min_score=` `&limit=` |
+| `GET /api/trends/enriched` | Enriched trends. Sort: `?sort=score\|seo\|growth\|latest` + `?category=` |
 | `GET /api/trends/top?n=10` | Top N trends |
 | `GET /api/trends/ideas?min_score=50` | Content article ideas |
-| `GET /api/trends/status` | Pipeline health, refresh info, errors |
+| `GET /api/trends/status` | Pipeline health + saved/dismissed counts |
 | `GET /api/trends/refresh` | Force immediate refresh |
+| `GET /api/trends/{rank}/article` | Generate article brief |
+| `GET /api/trends/{rank}/social` | Generate social post |
+| `POST /api/trends/{rank}/save` | Save a trend |
+| `POST /api/trends/{rank}/dismiss` | Dismiss a trend |
+| `GET /api/trends/saved` | List saved trends |
 
 ---
 
-## Integration with WordPress / Web App
+## API Keys
 
-### 1. WordPress Shortcode (PHP)
+Set via `.env` (or environment variables). **All keys are optional** — the pipeline runs
+with graceful fallbacks when they're missing.
 
-```php
-function digitalbrief_trending_feed($atts) {
-    $atts = shortcode_atts(['count' => 10, 'min_score' => 40], $atts);
-    $response = wp_remote_get("http://localhost:8765/api/trends?limit={$atts['count']}&min_score={$atts['min_score']}");
-    $body = json_decode(wp_remote_retrieve_body($response), true);
-    ob_start(); ?>
-    <div class="trending-widget">
-        <h4>🔥 Trending</h4>
-        <ol><?php foreach ($body['data'] as $t): ?>
-            <li><a href="<?= esc_url($t['url'] ?? '#') ?>"><?= esc_html($t['title']) ?></a></li>
-        <?php endforeach; ?></ol>
-    </div><?php
-    return ob_get_clean();
-}
-add_shortcode('trending_news', 'digitalbrief_trending_feed');
-```
+| Service | Env var | Notes |
+|---------|---------|-------|
+| Mediastack | `MEDIASTACK_KEY` | News API |
+| GNews | `GNEWS_KEY` | News API |
+| Currents | `CURRENTS_KEY` | News API |
+| NewsAPI | `NEWSAPI_KEY` | News headlines |
+| Reddit | `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | Script app |
 
-### 2. JavaScript Widget (any site)
-
-```html
-<fetch-trends count="8"></fetch-trends>
-<script>
-class FetchTrends extends HTMLElement {
-  async connectedCallback() {
-    const count = this.getAttribute('count') || 8;
-    const res = await fetch(`http://localhost:8765/api/trends/top?n=${count}`);
-    const { data } = await res.json();
-    this.innerHTML = data.map(t => 
-      `<div class="trend-item">#${t.rank} <a href="#">${t.title}</a></div>`
-    ).join('');
-  }
-}
-customElements.define('fetch-trends', FetchTrends);
-</script>
-```
+Google Trends + RSS feeds require no keys and always work.
 
 ---
 
-## How Scoring Works
+## Scoring
 
-Each trend gets a composite `trend_score` (0-100):
-
-| Factor | Weight |
-|--------|--------|
-| Source authority (Google > Reddit > NewsAPI > RSS) | Base weight |
-| Reddit upvotes | +0-30 |
-| Reddit comments | +0-20 |
-| Google search volume | +0-25 |
-| Multi-source appearance | +25 bonus |
-| Duplicate detected (>78% title similarity) | Merged + bonus |
+`trend_score` (0–100): source weight + popularity signals + multi-source bonus.
+`seo_score` (0–100): popularity (40) + real source URL (15) + description (15) +
+title quality (15) + multi-source (15).
 
 ---
 
 ## Customization
 
-### Add your own keywords
+- **Keywords** → `core/config.py` → `CONTENT_KEYWORDS`
+- **RSS feeds** → `core/config.py` → `RSS_FEEDS`
+- **Category rules** → `core/enrichment.py` → `CATEGORY_RULES`
+- **Refresh interval** → `core/config.py` → `REFRESH_INTERVAL_MINUTES`
 
-Edit `config.py` → `CONTENT_KEYWORDS` list. These are used for Google Trends lookups.
+---
 
-### Add RSS feeds
-
-Edit `config.py` → `RSS_FEEDS` list. Each entry is `("Display Name", "feed_url")`.
-
-### Change refresh interval
-
-Edit `config.py` → `REFRESH_INTERVAL_MINUTES`. Default: 30 minutes.
-
-### Change port
+## Deployment
 
 ```powershell
-$env:TREND_PORT = "8080"
-python server.py
+# Local production
+uvicorn api.index:app --host 0.0.0.0 --port 8765
+
+# Vercel — entry point is api/index.py (see vercel.json)
 ```
 
 ---
 
-## Production Deployment
+## Backward Compatibility
 
-```powershell
-# Install as Windows service or use a process manager
-pip install uvicorn[standard]
-
-# Run with production settings
-uvicorn server:app --host 0.0.0.0 --port 8765 --workers 1
-
-# Or with gunicorn (Linux)
-gunicorn server:app -w 1 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8765
-```
-
----
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| 429 Rate Limit | Google Trends blocking — try residential IP or proxy in `config.py` → `GOOGLE_TRENDS_PROXY` |
-| No Reddit data | Verify `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET` are set |
-| Empty dashboard | Check `http://localhost:8765/api/trends/status` — pipeline may still be fetching |
-| ModuleNotFoundError | Run `pip install -r requirements.txt` |
+The enrichment layer is **purely additive**. If it fails or is removed, trend
+fetching, aggregation, and the dashboard continue working unchanged — all enrichment
+fields are optional and have graceful fallbacks.

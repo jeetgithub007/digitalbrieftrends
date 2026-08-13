@@ -1,12 +1,2 @@
-# Exclude local server from Vercel scanning
+# Exclude local-only files from Vercel
 server.py
-
-# Exclude local-only files
-.env
-.env.example
-run_pipeline_now.py
-test_api.py
-test_server.py
-validate_apis.py
-verify_rss.py
-audit_seo.py
