@@ -1174,7 +1174,7 @@ const NEWS_CHANNELS = [
   { name: 'BBC News', region: 'UK', website: 'https://www.bbc.com/news', youtube: 'UC16niRr50-MSBwiO3YDb3RA', embed: 'youtube' },
   { name: 'Al Jazeera English', region: 'Global', website: 'https://www.aljazeera.com/live/', youtube: 'UCNye-wNBqNL5ZzHSJj3l8Bg', embed: 'iframely', iframelyUrl: 'https://iframely.net/shq5yDP6?theme=dark' },
   { name: 'France 24 English', region: 'France · Global', website: 'https://www.france24.com/en/live', youtube: 'UCQfwfsi5VrQ8yKZ-UWmAEFg', embed: 'youtube' },
-  { name: 'DW News', region: 'Germany · Global', website: 'https://www.dw.com/en/top-stories/s-9097', youtube: 'UCknLrEdhRCp1aegoMqRaCZg', embed: 'youtube' },
+  { name: 'DW News', region: 'Germany · Global', website: 'https://www.dw.com/en/top-stories/s-9097', youtube: 'UCknLrEdhRCp1aegoMqRaCZg', embed: 'iframely', iframelyUrl: 'https://iframely.net/LF5O0RHg?theme=dark', embedLink: 'https://www.dw.com/en/live-tv/channel-english' },
   { name: 'WION', region: 'India · Global', website: 'https://www.wionews.com', youtube: 'UC_gUM8rL-Lrg6O3adPW9K1g', embed: 'youtube' },
   { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'custom', embedUrl: 'https://feeds.intoday.in/livetv/ver-3-0/?id=livetv-it&aud_togle=1&autostart=0&mute=1&t_src=live_tv_page&t_med=web&utm_medium=web&dimlight=1&utm_source=live_tv_page&pip_icon=1&v=1.37&tt=1', embedAllow: 'encrypted-media *;' },
   { name: 'The Indian Express', region: 'India', website: 'https://indianexpress.com', youtube: 'UCJEDFSxHHOW1PpBccdSxOTA', embed: 'youtube' },
@@ -1228,7 +1228,7 @@ async function renderNewsChannels() {
         '</div>' +
         '<div class="iframely-wrap">' +
           '<div class="iframely-embed"><div class="iframely-responsive" style="padding-bottom: 56.25%; padding-top: 120px;">' +
-            '<a href="' + escapeHtml(ch.website || 'https://www.aljazeera.com/video/live') + '" aria-label="' + escapeHtml(ch.name) + ' live news" data-iframely-url="' + ch.iframelyUrl + '"></a>' +
+            '<a href="' + escapeHtml(ch.embedLink || ch.website || 'https://www.aljazeera.com/video/live') + '" aria-label="' + escapeHtml(ch.name) + ' live news" data-iframely-url="' + ch.iframelyUrl + '"></a>' +
           '</div></div>' +
         '</div>' +
         '<div class="video-actions">' +
