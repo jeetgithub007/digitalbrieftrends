@@ -6,7 +6,11 @@
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-<link rel="apple-touch-icon" href="/static/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+<link rel="mask-icon" href="/static/mask-icon.svg" color="#6366f1">
+<link rel="manifest" href="/static/manifest.webmanifest">
 <meta name="theme-color" content="#0f0f12">
 
 <title>DigitalBrief – Trending News, Topics &amp; Keywords Right Now</title>
@@ -22,6 +26,7 @@
 <meta property="og:description" content="Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.">
 <meta property="og:url" content="https://digitalbrief.in/">
 <meta property="og:image" content="https://digitalbrief.in/static/og-image.png">
+<meta property="og:image:alt" content="DigitalBrief — Trending News, Topics & Keywords Right Now">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -55,6 +60,7 @@
   "url": "https://digitalbrief.in/",
   "description": "Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.",
   "inLanguage": "en",
+  "image": "https://digitalbrief.in/static/og-image.png",
   "isPartOf": { "@type": "WebSite", "name": "DigitalBrief", "url": "https://digitalbrief.in/" }
 }
 </script>
@@ -366,7 +372,9 @@
   .video-note { color:var(--text2); font-size:.78rem; margin-top:.8rem; }
   /* Homepage SEO hero + enhancements (additive) */
   .header .brand { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
-  .header .brand a { color: inherit; text-decoration: none; }
+  .header .brand a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 9px; }
+  .brand-mark { width: 30px; height: 30px; flex-shrink: 0; }
+  .footer-mark { width: 18px; height: 18px; vertical-align: -4px; margin-right: 6px; }
   .header .brand span { color: var(--accent2); }
   .seo-hero { padding: 24px 0 12px; }
   .seo-hero h1 { font-size: clamp(1.55rem, 3.4vw, 2.45rem); font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 10px; background: linear-gradient(135deg, #a29bfe, #6c5ce7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -401,7 +409,8 @@
 <div class="app">
   <!-- Header -->
   <div class="header">
-    <div class="brand"><a href="/" aria-label="DigitalBrief home">📈 DigitalBrief <span>Trend Pipeline</span></a></div>
+    <div class="brand"><a href="/" aria-label="DigitalBrief home"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="16" fill="#15151c"/><rect x="2" y="2" width="60" height="60" rx="16" fill="#8b5cf6" opacity="0.22"/><rect x="2.5" y="2.5" width="59" height="59" rx="15.5" fill="none" stroke="#a78bfa" stroke-width="1.6"/><path d="M44.1 15.8 A9.5 9.5 0 0 1 56.2 27.9" fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round"/><path d="M46.9 17.2 A6.2 6.2 0 0 1 54.2 24.5" fill="none" stroke="#a78bfa" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><polyline points="12,46 22,46 28,32 34,38 42,22 48,26" fill="none" stroke="#eef2ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="26" r="4.2" fill="#22d3ee"/><circle cx="48" cy="26" r="7.4" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.55"/><circle cx="12" cy="46" r="2.4" fill="#a78bfa" opacity="0.9"/><circle cx="22" cy="46" r="2.4" fill="#818cf8" opacity="0.8"/></svg>
+      DigitalBrief <span>Trend Pipeline</span></a></div>
     <button class="btn btn-sm" onclick="openSubscription()" style="margin-left:auto;" aria-label="Subscribe to news">🔔 Subscribe</button>
     <div class="header-stats" id="headerStats">
       <div class="stat"><div class="stat-value">-</div><div class="stat-label">Total Trends</div></div>
@@ -1278,7 +1287,7 @@ scheduleSubscription();
 
 <!-- Footer -->
 <footer class="seo-footer" role="contentinfo">
-  <p><strong>DigitalBrief</strong> — Discover what's trending before everyone else. Real-time trending news, trending topics, trending keywords, search trends, breaking news and content ideas — updated automatically every 30 minutes.</p>
+  <p><svg class="footer-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="16" fill="#15151c"/><rect x="2" y="2" width="60" height="60" rx="16" fill="#8b5cf6" opacity="0.22"/><rect x="2.5" y="2.5" width="59" height="59" rx="15.5" fill="none" stroke="#a78bfa" stroke-width="1.6"/><path d="M44.1 15.8 A9.5 9.5 0 0 1 56.2 27.9" fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round"/><path d="M46.9 17.2 A6.2 6.2 0 0 1 54.2 24.5" fill="none" stroke="#a78bfa" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><polyline points="12,46 22,46 28,32 34,38 42,22 48,26" fill="none" stroke="#eef2ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="26" r="4.2" fill="#22d3ee"/><circle cx="48" cy="26" r="7.4" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.55"/><circle cx="12" cy="46" r="2.4" fill="#a78bfa" opacity="0.9"/><circle cx="22" cy="46" r="2.4" fill="#818cf8" opacity="0.8"/></svg><strong>DigitalBrief</strong> — Discover what's trending before everyone else. Real-time trending news, trending topics, trending keywords, search trends, breaking news and content ideas — updated automatically every 30 minutes.</p>
   <p class="seo-footer-kw">Trending topics today · Trending topics right now · Trending keywords today · What's trending today · Latest trending topics · Trending searches · Trending news today · Breaking news trends · Popular topics today · Rising search trends · Viral topics today · Technology trends · AI trends · Business trends · Entertainment trends · Social media trends</p>
   <p class="seo-footer-links"><a href="/">Home</a> · <a href="/dashboard">Dashboard</a> · <a href="/api/trends/top?n=10" rel="noopener">Top Trends API</a> · <a href="/robots.txt">robots.txt</a> · <a href="/sitemap.xml">Sitemap</a></p>
   <p class="seo-footer-copy">© 2026 DigitalBrief. Powered by Google Trends, GNews, Mediastack, Currents API, NewsAPI, Reddit &amp; 18 RSS feeds.</p>
