@@ -1169,13 +1169,13 @@ function scheduleSubscription() {
 
 // ── Video News ──
 const NEWS_CHANNELS = [
-  { name: 'NDTV', region: 'India', website: 'https://www.ndtv.com', youtube: 'UCZFMm1mMw0F81Z37aaEzTUA', embed: 'youtube' },
+  { name: 'NDTV', region: 'India', website: 'https://www.ndtv.com', youtube: 'UCZFMm1mMw0F81Z37aaEzTUA', embed: 'custom', embedUrl: 'https://www.ndtv.com/videos/embed-player/?id=LIVE_BG24x7&mute=1&autostart=1&mutestart=true&pWidth=100&pHeight=100', embedAllow: 'autoplay; fullscreen' },
   { name: 'BBC News', region: 'UK', website: 'https://www.bbc.com/news', youtube: 'UC16niRr50-MSBwiO3YDb3RA', embed: 'youtube' },
   { name: 'Al Jazeera English', region: 'Global', website: 'https://www.aljazeera.com/live/', youtube: 'UCNye-wNBqNL5ZzHSJj3l8Bg', embed: 'youtube' },
   { name: 'France 24 English', region: 'France · Global', website: 'https://www.france24.com/en/live', youtube: 'UCQfwfsi5VrQ8yKZ-UWmAEFg', embed: 'youtube' },
   { name: 'DW News', region: 'Germany · Global', website: 'https://www.dw.com/en/top-stories/s-9097', youtube: 'UCknLrEdhRCp1aegoMqRaCZg', embed: 'youtube' },
   { name: 'WION', region: 'India · Global', website: 'https://www.wionews.com', youtube: 'UC_gUM8rL-Lrg6O3adPW9K1g', embed: 'youtube' },
-  { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'custom', embedUrl: 'https://feeds.intoday.in/livetv/ver-3-0/?id=livetv-it&aud_togle=1&autostart=0&mute=1&t_src=live_tv_page&t_med=web&utm_medium=web&dimlight=1&utm_source=live_tv_page&pip_icon=1&v=1.37&tt=1' },
+  { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'custom', embedUrl: 'https://feeds.intoday.in/livetv/ver-3-0/?id=livetv-it&aud_togle=1&autostart=0&mute=1&t_src=live_tv_page&t_med=web&utm_medium=web&dimlight=1&utm_source=live_tv_page&pip_icon=1&v=1.37&tt=1', embedAllow: 'encrypted-media *;' },
   { name: 'The Indian Express', region: 'India', website: 'https://indianexpress.com', youtube: 'UCJEDFSxHHOW1PpBccdSxOTA', embed: 'youtube' },
   { name: 'News18 India', region: 'India', website: 'https://www.news18.com', youtube: 'UCPP3etACgdUWvizcES1dJ8Q', embed: 'youtube' },
   { name: 'Euronews', region: 'Europe · Global', website: 'https://www.euronews.com', youtube: 'UCSrZ3UV4jOidv8ppoVuvW9Q', embed: 'youtube' },
@@ -1209,7 +1209,7 @@ async function renderNewsChannels() {
           '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
         '</div>' +
         '<div class="video-embed">' +
-          '<iframe src="' + ch.embedUrl + '" title="' + escapeHtml(ch.name) + ' live news" frameborder="0" allowfullscreen allow="encrypted-media *;" loading="lazy"></iframe>' +
+          '<iframe src="' + ch.embedUrl + '" title="' + escapeHtml(ch.name) + ' live news" frameborder="0" scrolling="no" allowfullscreen allow="' + (ch.embedAllow || 'encrypted-media *;') + '" loading="lazy"></iframe>' +
         '</div>' +
         '<div class="video-actions">' +
           '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +

@@ -121,7 +121,8 @@ RSS_FEEDS = [(s["name"], s["url"]) for s in RSS_SOURCES if s.get("active", True)
 NEWS_CHANNELS = [
     {"name": "NDTV", "type": "channel", "region": "India",
      "website": "https://www.ndtv.com", "youtube": "UCZFMm1mMw0F81Z37aaEzTUA",
-     "embed": "youtube", "active": True, "priority": 95},
+     "embed": "custom", "embedUrl": "https://www.ndtv.com/videos/embed-player/?id=LIVE_BG24x7&mute=1&autostart=1&mutestart=true&pWidth=100&pHeight=100",
+     "embedAllow": "autoplay; fullscreen", "active": True, "priority": 95},
     {"name": "BBC News", "type": "channel", "region": "UK",
      "website": "https://www.bbc.com/news", "youtube": "UC16niRr50-MSBwiO3YDb3RA",
      "embed": "youtube", "active": True, "priority": 94},
