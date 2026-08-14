@@ -272,6 +272,7 @@
     .header h1 { font-size: 1.2rem; }
     .trends-grid { grid-template-columns: 1fr; }
     .cat-group-grid { grid-template-columns: 1fr; }
+    .widgets-grid { grid-template-columns: 1fr; }
     .ideas-grid { grid-template-columns: 1fr; }
     .controls { flex-direction: column; align-items: stretch; }
     .score-slider { margin-left: 0; }
@@ -401,6 +402,64 @@
   .off-air-box .off-air-note { display:block; font-size:.75rem; line-height:1.5; margin-bottom:.7rem; }
   .off-air-box a { color:var(--accent2); text-decoration:none; font-size:.8rem; }
   .off-air-box a:hover { text-decoration:underline; }
+  /* Live widgets */
+  .widgets-section { margin-top: 8px; }
+  .widgets-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .widget-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; min-width:0; }
+  .widget-card.skeleton { min-height:150px; }
+  .weather-card { background:linear-gradient(135deg,#12265c 0%,#1e3a5f 55%,#263a4a 100%); border-color:rgba(96,165,250,.35); grid-column:1 / -1; }
+  .sports-card { grid-column:1 / -1; }
+  .widget-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .widget-title { font-weight:800; font-size:.95rem; }
+  .widget-meta { margin-left:auto; font-size:.72rem; color:var(--text2); }
+  .widget-meta.live { color:#f87171; font-weight:700; }
+  .wx-main { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .wx-temp { font-size:2.5rem; font-weight:800; line-height:1; }
+  .wx-cond { display:flex; align-items:center; gap:8px; font-size:.88rem; }
+  .wx-icon { font-size:1.7rem; }
+  .wx-details { display:flex; gap:14px; flex-wrap:wrap; margin:10px 0 12px; font-size:.75rem; color:var(--text2); }
+  .wx-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+  .wx-day { text-align:center; background:rgba(255,255,255,.08); border-radius:8px; padding:8px 4px; display:flex; flex-direction:column; gap:3px; }
+  .wx-day-name { font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; opacity:.85; }
+  .wx-day-icon { font-size:1.05rem; }
+  .wx-day-hi { font-weight:700; font-size:.85rem; }
+  .wx-day-lo { font-size:.72rem; color:var(--text2); }
+  .stock-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .stock-row:last-child { border-bottom:0; }
+  .stock-id { flex:1; min-width:0; display:flex; flex-direction:column; }
+  .stock-name { font-weight:600; font-size:.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .stock-sym { font-size:.68rem; color:var(--text2); }
+  .stock-badge { display:inline-block; margin-left:6px; font-size:.6rem; font-weight:700; padding:1px 5px; border-radius:99px; }
+  .stock-badge.up { background:rgba(34,197,94,.15); color:#4ade80; }
+  .stock-badge.down { background:rgba(239,68,68,.15); color:#f87171; }
+  .stock-nums { text-align:right; display:flex; flex-direction:column; }
+  .stock-price { font-weight:700; font-size:.9rem; font-variant-numeric:tabular-nums; }
+  .stock-chg { font-size:.75rem; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stock-chg.up { color:#4ade80; } .stock-chg.down { color:#f87171; }
+  .spark { display:block; }
+  .match-row { padding:8px 0; border-bottom:1px solid var(--border); }
+  .match-row:last-child { border-bottom:0; }
+  .match-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .match-state { font-size:.62rem; font-weight:800; letter-spacing:.04em; color:var(--text2); background:var(--border); padding:2px 7px; border-radius:4px; }
+  .match-state.live { background:#ef4444; color:#fff; }
+  .match-series { font-size:.68rem; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .match-line { display:flex; align-items:baseline; gap:10px; font-size:.9rem; }
+  .match-side { display:flex; gap:8px; align-items:baseline; min-width:0; }
+  .match-side:last-child { margin-left:auto; }
+  .match-team { font-weight:700; }
+  .match-score { font-variant-numeric:tabular-nums; color:var(--text2); font-size:.8rem; }
+  .match-vs { color:var(--text2); font-size:.68rem; }
+  .match-status { font-size:.74rem; color:var(--text2); margin-top:5px; }
+  .widget-error, .widget-empty { padding:20px 8px; text-align:center; color:var(--text2); font-size:.85rem; }
+  .sport-block { padding:8px 0; border-bottom:1px solid var(--border); }
+  .sport-block:last-child { border-bottom:0; }
+  .sport-block-title { font-size:.75rem; font-weight:800; margin-bottom:6px; color:var(--accent2); }
+  .sport-row { display:flex; align-items:center; gap:8px; font-size:.8rem; padding:3px 0; }
+  .sport-name { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sport-status { font-size:.68rem; color:var(--text2); }
+  .sport-score { font-weight:700; font-variant-numeric:tabular-nums; }
+  .skeleton .pulse-block { height:14px; margin-bottom:10px; border-radius:8px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent); background-size:200% 100%; animation:pulse 1.5s infinite; }
+  .skeleton .pulse-block.tall { height:48px; }
   .video-link-body { padding:.1rem .9rem .9rem; }
   .video-link-body p { color:var(--text2); font-size:.8rem; line-height:1.45; margin:0 0 .8rem; }
   .publisher-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; background:#22c55e22; color:#22c55e; }
@@ -480,6 +539,17 @@
   <!-- Trending Topics by Category -->
   <h2 class="section-title">🗂️ Trending Topics by Category <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(click a card to filter)</span></h2>
   <div class="cat-cards" id="catCards"></div>
+
+  <!-- Live Widgets (real-time data, no fake content) -->
+  <section class="widgets-section" aria-label="Live widgets: weather, markets, cricket and sports">
+    <h2 class="section-title">📊 Live Widgets <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(real-time · weather, markets, cricket &amp; sports)</span></h2>
+    <div class="widgets-grid" id="widgetsGrid">
+      <div class="widget-card skeleton"><div class="pulse-block tall"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+    </div>
+  </section>
   <!-- Category Navigation -->
   <nav class="cat-nav" id="catNav" aria-label="News categories">
     <button class="cat-chip active" data-cat="all" onclick="filterByCategory('all')">🔥 All</button>
@@ -1070,6 +1140,7 @@ async function autoTick() {
       await fetchData();   // cheap cache re-read keeps UI in sync
     }
     renderNewsChannels(); // refresh live-channel states (server-cached probes)
+    renderWidgets(); // refresh live widgets (server-cached)
   } catch (e) {
     // Backend unreachable (e.g. static preview) — keep UI working with sample data
     try { await fetchData(); } catch (_) {}
@@ -1258,6 +1329,137 @@ async function renderNewsChannels() {
   }).join('');
 }
 
+// ── Live Widgets (real data from /api/widgets — weather, markets, cricket, sports) ──
+async function renderWidgets() {
+  const grid = document.getElementById('widgetsGrid');
+  if (!grid) return;
+  let sections = null;
+  try {
+    const res = await fetch('/api/widgets');
+    if (res.ok) { const j = await res.json(); sections = (j.data || {}).sections || {}; }
+  } catch (e) { /* fall through to honest error state */ }
+  const S = sections || {};
+  grid.innerHTML = weatherCardHtml(S.weather || {}) + stockCardHtml(S.stocks || {}) +
+    cricketCardHtml(S.cricket || {}) + sportsCardHtml(S.sports || {});
+}
+
+function weatherCardHtml(w) {
+  const days = (w.days || []).slice(0, 5);
+  const strip = days.map((d, i) => {
+    const dt = new Date(d.date + 'T00:00:00');
+    const dn = i === 0 ? 'Today' : isNaN(dt) ? d.date.slice(5) : dt.toLocaleDateString('en-IN', { weekday: 'short' });
+    return '<div class="wx-day">' +
+      '<span class="wx-day-name">' + dn + '</span>' +
+      '<span class="wx-day-icon">' + d.icon + '</span>' +
+      '<span class="wx-day-hi">' + Math.round(d.max) + '\u00b0</span>' +
+      '<span class="wx-day-lo">' + Math.round(d.min) + '\u00b0</span></div>';
+  }).join('');
+  const inner = w.ok ? (
+    '<div class="wx-main">' +
+      '<div class="wx-temp">' + Math.round(w.temp) + '\u00b0C</div>' +
+      '<div class="wx-cond"><span class="wx-icon">' + w.icon + '</span><span>' + escapeHtml(w.label) + '</span></div>' +
+    '</div>' +
+    '<div class="wx-details">' +
+      '<span>Feels ' + Math.round(w.feels || w.temp) + '\u00b0</span>' +
+      '<span>\u{1F4A7} Humidity ' + (w.humidity != null ? w.humidity + '%' : 'n/a') + '</span>' +
+      '<span>\u{1F4A8} Wind ' + (w.wind != null ? w.wind + ' km/h' : 'n/a') + '</span>' +
+    '</div>' +
+    '<div class="wx-strip">' + strip + '</div>'
+  ) : (
+    '<div class="widget-error">' + escapeHtml(w.error || 'Weather data temporarily unavailable') + '</div>'
+  );
+  return '<div class="widget-card weather-card">' +
+    '<div class="widget-head"><span class="widget-title">\u{1F324} Weather</span>' +
+    '<span class="widget-meta">' + escapeHtml(w.city || 'New Delhi') + '</span></div>' + inner + '</div>';
+}
+
+function sparklineHtml(closes, up) {
+  if (!closes || closes.length < 2) return '';
+  const W = 64, H = 20;
+  const min = Math.min.apply(null, closes), max = Math.max.apply(null, closes);
+  const span = (max - min) || 1;
+  const pts = closes.map((c, i) =>
+    ((i / (closes.length - 1)) * (W - 4) + 2) + ',' + (H - 2 - ((c - min) / span) * (H - 4))
+  ).join(' ');
+  return '<svg class="spark" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="' + (up ? '#22c55e' : '#ef4444') + '" stroke-width="1.5"/></svg>';
+}
+
+function fmtNum(v) {
+  if (v == null) return '—';
+  return Number(v).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+}
+
+function stockCardHtml(s) {
+  const rows = (s.rows || []).map(q => {
+    const up = (q.change_pct || 0) >= 0;
+    const badge = Math.abs(q.change_pct) >= 1
+      ? '<span class="stock-badge ' + (up ? 'up' : 'down') + '">' + (up ? '\u25B2 Rising fast' : '\u25BC Falling fast') + '</span>' : '';
+    return '<div class="stock-row">' +
+      '<div class="stock-id"><span class="stock-name">' + escapeHtml(q.name) + '</span>' +
+      '<span class="stock-sym">' + escapeHtml(q.symbol) + badge + '</span></div>' +
+      '<div class="stock-spark">' + sparklineHtml(q.spark, up) + '</div>' +
+      '<div class="stock-nums"><span class="stock-price">' + fmtNum(q.price) + '</span>' +
+      '<span class="stock-chg ' + (up ? 'up' : 'down') + '">' + (up ? '+' : '') + q.change_pct + '%</span></div>' +
+    '</div>';
+  }).join('');
+  const body = !s.ok ? '<div class="widget-error">' + escapeHtml(s.error || 'Market data temporarily unavailable') + '</div>'
+    : rows || '<div class="widget-empty">Market data loading\u2026</div>';
+  return '<div class="widget-card">' +
+    '<div class="widget-head"><span class="widget-title">\u{1F4C8} Market Watch</span>' +
+    '<span class="widget-meta">NIFTY \u00b7 SENSEX \u00b7 Gold</span></div>' + body + '</div>';
+}
+
+function cricketCardHtml(c) {
+  const matches = (c.matches || []).slice(0, 6);
+  const liveCount = matches.filter(m => m.state === 'In Progress').length;
+  const body = !c.ok
+    ? '<div class="widget-error">' + escapeHtml(c.error || 'Cricket scores temporarily unavailable') + '</div>'
+    : matches.length === 0
+      ? '<div class="widget-empty">' + escapeHtml(c.note || 'No live matches right now') + '</div>'
+      : matches.map(m => {
+          const live = m.state === 'In Progress';
+          const s1 = m.team1.score, s2 = m.team2.score;
+          const unit = m.format === 'HUN' ? 'b' : 'ov';
+          const sc1 = s1 ? s1.runs + '/' + (s1.wkts != null ? s1.wkts : 0) + (s1.overs ? ' (' + s1.overs + ' ' + unit + ')' : '') : '\u2014';
+          const sc2 = s2 ? s2.runs + '/' + (s2.wkts != null ? s2.wkts : 0) : '\u2014';
+          return '<div class="match-row">' +
+            '<div class="match-head"><span class="match-state' + (live ? ' live' : '') + '">' + (live ? '\u25CF LIVE' : escapeHtml(m.state)) + '</span>' +
+            '<span class="match-series">' + escapeHtml(m.series + (m.desc ? ' \u00b7 ' + m.desc : '')) + '</span></div>' +
+            '<div class="match-line">' +
+              '<span class="match-side"><span class="match-team">' + escapeHtml(m.team1.sname) + '</span><span class="match-score">' + sc1 + '</span></span>' +
+              '<span class="match-vs">vs</span>' +
+              '<span class="match-side"><span class="match-team">' + escapeHtml(m.team2.sname) + '</span><span class="match-score">' + sc2 + '</span></span>' +
+            '</div>' +
+            '<div class="match-status">' + escapeHtml(m.status) + '</div>' +
+          '</div>';
+        }).join('');
+  return '<div class="widget-card">' +
+    '<div class="widget-head"><span class="widget-title">\u{1F3CF} Cricket</span>' +
+    '<span class="widget-meta' + (liveCount ? ' live' : '') + '">' + (liveCount ? '\u25CF ' + liveCount + ' live' : 'live &amp; upcoming') + '</span></div>' + body + '</div>';
+}
+
+function sportsCardHtml(sp) {
+  const leagues = (sp.leagues || []).slice(0, 4);
+  const body = !sp.ok
+    ? '<div class="widget-error">' + escapeHtml(sp.error || 'Sports data temporarily unavailable') + '</div>'
+    : leagues.length === 0
+      ? '<div class="widget-empty">No sports events right now</div>'
+      : leagues.map(lg => {
+          const evs = (lg.events || []).slice(0, 3).map(e => {
+            const t = (e.teams || []).map(x => escapeHtml(x.abbr || x.name)).join(' vs ');
+            const showSc = (e.teams || []).some(x => x.score != null) && !/Scheduled|Preview/i.test(e.status || '');
+            const sc = showSc ? (e.teams || []).filter(x => x.score != null).map(x => x.score).join(' - ') : '';
+            return '<div class="sport-row"><span class="sport-name">' + (t || escapeHtml(e.name)) + '</span>' +
+              '<span class="sport-status">' + escapeHtml(e.status) + '</span>' +
+              (sc ? '<span class="sport-score">' + sc + '</span>' : '') + '</div>';
+          }).join('');
+          return '<div class="sport-block"><div class="sport-block-title">' + lg.icon + ' ' + escapeHtml(lg.name) + '</div>' + evs + '</div>';
+        }).join('');
+  return '<div class="widget-card sports-card">' +
+    '<div class="widget-head"><span class="widget-title">\u{1F3C5} Sports</span>' +
+    '<span class="widget-meta">live &amp; upcoming</span></div>' + body + '</div>';
+}
+
 // ── Init ──
 // ── Homepage SEO enhancements (additive; existing features untouched) ──
 let currentKeyword = null;
@@ -1373,6 +1575,7 @@ function renderHomeEnhancements() {
     ld.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Trending Now', itemListElement: items });
   }
 }
+renderWidgets();
 renderNewsChannels();
 fetchData();
 refreshTimerId = setInterval(autoTick, AUTO_CFG.POLL_MS); // auto-update (manual + auto share one guard)

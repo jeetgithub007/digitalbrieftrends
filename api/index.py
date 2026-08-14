@@ -231,6 +231,24 @@ async def api_dismiss(rank: int):
     return cache.dismiss(t["title"])
 
 
+@app.get("/api/widgets")
+async def api_widgets():
+    """Real-data live widgets bundle (weather, markets, cricket, sports). Cached."""
+    from core.widgets import get_widgets
+    import time
+    try:
+        state = await get_widgets()
+        data = state.get("data") or {"sections": {}}
+        return {
+            "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S+05:30", time.localtime(state.get("checked_at") or time.time())),
+            "error": state.get("error"),
+            "ttl_seconds": 120,
+            "data": data,
+        }
+    except Exception as e:  # noqa: BLE001 - never take the section down
+        return {"checked_at": None, "error": str(e)[:200], "ttl_seconds": 120, "data": {"sections": {}}}
+
+
 @app.get("/api/channels/live")
 async def api_channels_live():
     """Live-state probe results for the Video News channels (cached, single-flight)."""
