@@ -1179,7 +1179,7 @@ const NEWS_CHANNELS = [
   { name: 'The Indian Express', region: 'India', website: 'https://indianexpress.com', youtube: 'UCJEDFSxHHOW1PpBccdSxOTA', embed: 'youtube' },
   { name: 'News18 India', region: 'India', website: 'https://www.news18.com', youtube: 'UCPP3etACgdUWvizcES1dJ8Q', embed: 'youtube' },
   { name: 'Euronews', region: 'Europe · Global', website: 'https://www.euronews.com', youtube: 'UCSrZ3UV4jOidv8ppoVuvW9Q', embed: 'youtube' },
-  { name: 'Sky News', region: 'UK', website: 'https://news.sky.com', youtube: 'UCoMdktPbSTixAyNGwb-UYkQ', embed: 'link', note: 'Sky News restricts live-stream embedding — watch on the official site or YouTube.' },
+  { name: 'Sky News', region: 'UK', website: 'https://news.sky.com', youtube: 'UCoMdktPbSTixAyNGwb-UYkQ', embed: 'custom', embedUrl: 'https://www.youtube.com/embed/YDvsBbKfLPA?rel=0', embedAllow: 'accelerometer *; clipboard-write *; encrypted-media *; gyroscope *; picture-in-picture *; web-share *;' },
   { name: 'Reuters', region: 'Global', website: 'https://www.reuters.com', youtube: 'UChqUTb7kYRX8-EiaN3XFrSQ', embed: 'link', note: 'Reuters video is licensed — watch on the official site or YouTube.' },
   { name: 'Times of India', region: 'India', website: 'https://timesofindia.indiatimes.com', youtube: '', embed: 'link', note: 'Times of India offers RSS headlines (integrated in the news feed above) — visit the official site.' },
 ];
@@ -1209,7 +1209,7 @@ async function renderNewsChannels() {
           '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
         '</div>' +
         '<div class="video-embed">' +
-          '<iframe src="' + ch.embedUrl + '" title="' + escapeHtml(ch.name) + ' live news" frameborder="0" scrolling="no" allowfullscreen allow="' + (ch.embedAllow || 'encrypted-media *;') + '" loading="lazy"></iframe>' +
+          '<iframe src="' + ch.embedUrl + '" title="' + escapeHtml(ch.name) + ' live news" frameborder="0" scrolling="no" allowfullscreen referrerpolicy="strict-origin" allow="' + (ch.embedAllow || 'encrypted-media *;') + '" loading="lazy"></iframe>' +
         '</div>' +
         '<div class="video-actions">' +
           '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +
