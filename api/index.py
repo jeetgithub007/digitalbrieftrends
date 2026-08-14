@@ -231,6 +231,23 @@ async def api_dismiss(rank: int):
     return cache.dismiss(t["title"])
 
 
+@app.get("/api/channels/live")
+async def api_channels_live():
+    """Live-state probe results for the Video News channels (cached, single-flight)."""
+    from core.channels import get_channel_states
+    import time
+    try:
+        state = await get_channel_states(NEWS_CHANNELS)
+        return {
+            "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S+05:30", time.localtime(state["checked_at"])),
+            "error": state.get("error"),
+            "data": state["channels"],
+            "total": len(state["channels"]),
+        }
+    except Exception as e:  # noqa: BLE001 - never take the section down
+        return {"checked_at": None, "error": str(e)[:200], "data": [], "total": 0}
+
+
 @app.get("/api/channels")
 async def api_channels():
     """News-channel registry from the source config (URLs sanitized to http/https)."""

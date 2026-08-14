@@ -395,6 +395,12 @@
   .video-actions { display:flex; flex-wrap:wrap; gap:.9rem; padding:.5rem .9rem .8rem; }
   .video-actions .video-watch { padding:0; }
   .video-live.off { background:#64748b; }
+  .video-embed.off-air { padding-top:0; display:flex; align-items:center; justify-content:center; min-height:160px; background:var(--surface); }
+  .off-air-box { text-align:center; color:var(--text2); font-size:.85rem; padding:1.2rem; max-width:260px; }
+  .off-air-box .off-air-label { display:block; font-weight:700; color:var(--text); font-size:.9rem; margin-bottom:.35rem; }
+  .off-air-box .off-air-note { display:block; font-size:.75rem; line-height:1.5; margin-bottom:.7rem; }
+  .off-air-box a { color:var(--accent2); text-decoration:none; font-size:.8rem; }
+  .off-air-box a:hover { text-decoration:underline; }
   .video-link-body { padding:.1rem .9rem .9rem; }
   .video-link-body p { color:var(--text2); font-size:.8rem; line-height:1.45; margin:0 0 .8rem; }
   .publisher-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; background:#22c55e22; color:#22c55e; }
@@ -1063,6 +1069,7 @@ async function autoTick() {
     } else {
       await fetchData();   // cheap cache re-read keeps UI in sync
     }
+    renderNewsChannels(); // refresh live-channel states (server-cached probes)
   } catch (e) {
     // Backend unreachable (e.g. static preview) — keep UI working with sample data
     try { await fetchData(); } catch (_) {}
@@ -1178,41 +1185,73 @@ const NEWS_CHANNELS = [
 ];
 
 // Single edit point for the live-news section: add/swap channels here.
-function renderNewsChannels() {
+// Live state comes from /api/channels/live (server probes each channel's
+// actual live video): live -> embed the concrete video; off air -> honest
+// off-air card; probe unknown -> fall back to the classic live_stream embed.
+async function renderNewsChannels() {
   const grid = document.getElementById('videoGrid');
   if (!grid) return;
+  let states = {};
+  try {
+    const res = await fetch('/api/channels/live');
+    if (res.ok) {
+      const j = await res.json();
+      (j.data || []).forEach(st => { if (st && st.name) states[st.name] = st; });
+    }
+  } catch (e) { /* backend unreachable -> fallback embed below */ }
   grid.innerHTML = NEWS_CHANNELS.map(ch => {
     if (ch.embed === 'youtube' && ch.youtube) {
-      return '<div class="video-card">' +
-        '<div class="video-head">' +
-          '<span class="video-live">● LIVE</span>' +
-          '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
-          '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
-        '</div>' +
-        '<div class="video-embed">' +
-          '<iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + ch.youtube + '&autoplay=1&mute=1"' +
+      const st = states[ch.name] || {};
+      const live = st.live === true && st.video_id;
+      const off = st.live === false;
+      const liveBadge = '<span class="video-live' + (live ? '' : ' off') + '">' + (live ? '\u25CF LIVE' : '\u25CF OFF AIR') + '</span>';
+      let embed;
+      if (live) {
+        embed = '<div class="video-embed">' +
+          '<iframe src="https://www.youtube-nocookie.com/embed/' + st.video_id + '?autoplay=1&mute=1&playsinline=1"' +
           ' title="' + escapeHtml(ch.name) + ' live news" frameborder="0" allowfullscreen' +
           ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
           ' loading="lazy"></iframe>' +
+        '</div>';
+      } else if (off) {
+        embed = '<div class="video-embed off-air">' +
+          '<div class="off-air-box">' +
+            '<span class="off-air-label">Not live right now</span>' +
+            '<span class="off-air-note">No active broadcast on YouTube at the moment — check the official channel.</span>' +
+            '<a href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +
+          '</div>' +
+        '</div>';
+      } else {
+        embed = '<div class="video-embed">' +
+          '<iframe src="https://www.youtube-nocookie.com/embed/live_stream?channel=' + ch.youtube + '&autoplay=1&mute=1&playsinline=1"' +
+          ' title="' + escapeHtml(ch.name) + ' live news" frameborder="0" allowfullscreen' +
+          ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+          ' loading="lazy"></iframe>' +
+        '</div>';
+      }
+      return '<div class="video-card">' +
+        '<div class="video-head">' + liveBadge +
+          '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
+          '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
         '</div>' +
+        embed +
         '<div class="video-actions">' +
-          '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube ↗</a>' +
-          (ch.website ? '<a class="video-watch" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Website ↗</a>' : '') +
+          '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +
+          (ch.website ? '<a class="video-watch" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Website \u2197</a>' : '') +
         '</div>' +
       '</div>';
     }
     // Link card — embedding blocked/unsupported by the source's security policy (never bypassed)
     return '<div class="video-card link-card">' +
       '<div class="video-head">' +
-        '<span class="video-live off">●</span>' +
+        '<span class="video-live off">\u25CF</span>' +
         '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
         '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
       '</div>' +
-      '<div class="video-link-body">' +
-        '<p>' + escapeHtml(ch.note || 'Watch on the official channel website.') + '</p>' +
+      '<div class="video-link-body">' + (ch.note ? '<p>' + escapeHtml(ch.note) + '</p>' : '') +
         '<div class="video-actions">' +
-          (ch.website ? '<a class="action-btn" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Official Site ↗</a>' : '') +
-          (ch.youtube ? '<a class="action-btn" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube ↗</a>' : '') +
+          '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +
+          (ch.website ? '<a class="video-watch" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Website \u2197</a>' : '') +
         '</div>' +
       '</div>' +
     '</div>';
