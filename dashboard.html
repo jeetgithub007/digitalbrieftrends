@@ -1175,7 +1175,7 @@ const NEWS_CHANNELS = [
   { name: 'France 24 English', region: 'France · Global', website: 'https://www.france24.com/en/live', youtube: 'UCQfwfsi5VrQ8yKZ-UWmAEFg', embed: 'youtube' },
   { name: 'DW News', region: 'Germany · Global', website: 'https://www.dw.com/en/top-stories/s-9097', youtube: 'UCknLrEdhRCp1aegoMqRaCZg', embed: 'youtube' },
   { name: 'WION', region: 'India · Global', website: 'https://www.wionews.com', youtube: 'UC_gUM8rL-Lrg6O3adPW9K1g', embed: 'youtube' },
-  { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'youtube' },
+  { name: 'India Today', region: 'India', website: 'https://www.indiatoday.in', youtube: 'UCYPvAwZP8pZhSMW8qs7cVCw', embed: 'custom', embedUrl: 'https://feeds.intoday.in/livetv/ver-3-0/?id=livetv-it&aud_togle=1&autostart=0&mute=1&t_src=live_tv_page&t_med=web&utm_medium=web&dimlight=1&utm_source=live_tv_page&pip_icon=1&v=1.37&tt=1' },
   { name: 'The Indian Express', region: 'India', website: 'https://indianexpress.com', youtube: 'UCJEDFSxHHOW1PpBccdSxOTA', embed: 'youtube' },
   { name: 'News18 India', region: 'India', website: 'https://www.news18.com', youtube: 'UCPP3etACgdUWvizcES1dJ8Q', embed: 'youtube' },
   { name: 'Euronews', region: 'Europe · Global', website: 'https://www.euronews.com', youtube: 'UCSrZ3UV4jOidv8ppoVuvW9Q', embed: 'youtube' },
@@ -1200,6 +1200,23 @@ async function renderNewsChannels() {
     }
   } catch (e) { /* backend unreachable -> fallback embed below */ }
   grid.innerHTML = NEWS_CHANNELS.map(ch => {
+    // Official source-provided embed (e.g. India Today Live TV player)
+    if (ch.embed === 'custom' && ch.embedUrl) {
+      return '<div class="video-card">' +
+        '<div class="video-head">' +
+          '<span class="video-live">\u25CF LIVE</span>' +
+          '<span class="video-name">' + escapeHtml(ch.name) + '</span>' +
+          '<span class="video-region">' + escapeHtml(ch.region || '') + '</span>' +
+        '</div>' +
+        '<div class="video-embed">' +
+          '<iframe src="' + ch.embedUrl + '" title="' + escapeHtml(ch.name) + ' live news" frameborder="0" allowfullscreen allow="encrypted-media *;" loading="lazy"></iframe>' +
+        '</div>' +
+        '<div class="video-actions">' +
+          '<a class="video-watch" href="https://www.youtube.com/channel/' + ch.youtube + '" rel="noopener">Watch on YouTube \u2197</a>' +
+          (ch.website ? '<a class="video-watch" href="' + escapeHtml(ch.website) + '" rel="noopener">Visit Website \u2197</a>' : '') +
+        '</div>' +
+      '</div>';
+    }
     if (ch.embed === 'youtube' && ch.youtube) {
       const st = states[ch.name] || {};
       const live = st.live === true && st.video_id;
