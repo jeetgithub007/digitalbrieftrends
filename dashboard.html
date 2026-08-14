@@ -287,6 +287,30 @@
   .kw-chip { display:inline-block; background:var(--surface2,#151a24); color:var(--text2,#94a3b8); font-size:0.72rem; padding:3px 9px; border-radius:99px; margin:2px 3px 2px 0; border:1px solid var(--border,#232636); }
   .trend-img { width:100%; height:130px; object-fit:cover; border-radius:10px; margin-bottom:10px; }
   .trend-keywords { margin-top:8px; }
+/* Breaking news ticker */
+.ticker { display:flex; align-items:stretch; margin-top:14px; background:linear-gradient(90deg, rgba(239,68,68,0.14), rgba(15,15,18,0.55)); border:1px solid rgba(239,68,68,0.30); border-radius:12px; overflow:hidden; box-shadow:0 4px 18px rgba(0,0,0,0.35); }
+.ticker-badge { display:flex; align-items:center; gap:7px; padding:10px 16px; background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; font-weight:800; font-size:0.8rem; letter-spacing:0.12em; white-space:nowrap; flex-shrink:0; }
+.ticker-dot { width:8px; height:8px; border-radius:50%; background:#fff; animation:tickerPulse 1.1s ease-in-out infinite; }
+@keyframes tickerPulse { 0%,100% { opacity:1; transform:scale(1);} 50% { opacity:0.45; transform:scale(0.7);} }
+.ticker-viewport { flex:1; min-width:0; overflow:hidden; display:flex; align-items:center; }
+.ticker-track { display:inline-flex; align-items:center; white-space:nowrap; padding:0 8px; will-change:transform; animation:tickerScroll 45s linear infinite; }
+@keyframes tickerScroll { from { transform:translateX(0);} to { transform:translateX(-50%);} }
+.ticker:hover .ticker-track, .ticker:focus-within .ticker-track { animation-play-state:paused; }
+.ticker-item { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; color:var(--text2,#cbd5e1); font-size:0.85rem; text-decoration:none; min-height:44px; }
+.ticker-item:hover { color:#fff; }
+.ticker-cat { background:rgba(99,102,241,0.22); border:1px solid rgba(129,140,248,0.4); color:#a5b4fc; font-size:0.62rem; font-weight:700; letter-spacing:0.08em; padding:2px 7px; border-radius:100px; }
+.ticker-title { font-weight:500; }
+.ticker-sep { color:#ef4444; font-size:0.6rem; margin:0 6px; opacity:0.8; }
+.ticker-fallback { color:var(--text2,#94a3b8); font-style:italic; }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation:none !important; overflow-x:auto; }
+  .ticker-dot { animation:none; }
+}
+@media (max-width: 768px) {
+  .ticker-badge { padding:8px 10px; font-size:0.68rem; letter-spacing:0.08em; }
+  .ticker-item { font-size:0.78rem; padding:7px 9px; }
+}
+
   .trend-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; padding-top:10px; border-top:1px solid var(--border,#232636); }
   .action-btn { background:var(--surface2,#151a24); color:var(--text,#e2e8f0); border:1px solid var(--border,#232636); border-radius:7px; padding:5px 10px; font-size:0.74rem; cursor:pointer; transition:border-color .15s, background .15s; }
   .action-btn:hover { border-color:var(--accent,#6366f1); background:rgba(99,102,241,0.12); }
@@ -434,21 +458,11 @@
     <h1 id="seoHeroH1">Trending News, Topics &amp; Keywords Right Now</h1>
     <p class="seo-tagline">Discover What's Trending Before Everyone Else.</p>
     <p class="seo-intro">DigitalBrief tracks rising topics, keywords, news and search trends across AI, technology, business, entertainment, markets and social media — so you can see what people are talking about right now and turn today's trending topics into timely content ideas.</p>
-    <div class="kw-cluster" id="heroKwCluster" aria-label="Trending topics and keywords">
-      <button type="button" class="kw-chip" data-kw="trending topics">Trending Topics</button>
-      <button type="button" class="kw-chip" data-kw="trending news">Trending News</button>
-      <button type="button" class="kw-chip" data-kw="what's trending today">What's Trending Today</button>
-      <button type="button" class="kw-chip" data-kw="trending keywords">Trending Keywords</button>
-      <button type="button" class="kw-chip" data-kw="trending searches">Trending Searches</button>
-      <button type="button" class="kw-chip" data-kw="search trends">Search Trends</button>
-      <button type="button" class="kw-chip" data-kw="breaking news">Breaking News</button>
-      <button type="button" class="kw-chip" data-kw="content ideas">Content Ideas</button>
-      <button type="button" class="kw-chip" data-kw="technology trends">Technology Trends</button>
-      <button type="button" class="kw-chip" data-kw="AI trends">AI Trends</button>
-      <button type="button" class="kw-chip" data-kw="business trends">Business Trends</button>
-      <button type="button" class="kw-chip" data-kw="entertainment trends">Entertainment Trends</button>
-      <button type="button" class="kw-chip" data-kw="viral topics">Viral Topics</button>
-      <button type="button" class="kw-chip" data-kw="rising search trends">Rising Search Trends</button>
+    <div class="ticker" id="breakingTicker" role="region" aria-label="Breaking news ticker">
+      <div class="ticker-badge"><span class="ticker-dot" aria-hidden="true"></span>BREAKING</div>
+      <div class="ticker-viewport">
+        <div class="ticker-track" id="tickerTrack"><span class="ticker-item ticker-fallback">Loading live headlines&hellip;</span></div>
+      </div>
     </div>
   </section>
   <!-- Category Navigation -->
@@ -1306,5 +1320,47 @@ scheduleSubscription();
     </form>
   </div>
 </div>
+<script>
+/* Breaking news ticker — live headlines from the pipeline (real data only) */
+(function () {
+  var track = document.getElementById('tickerTrack');
+  if (!track) return;
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function articleUrl(t) {
+    if (t && t.url && t.url !== '#' && /^https?:\/\//i.test(t.url)) return t.url;
+    return 'https://news.google.com/search?q=' + encodeURIComponent(String((t && t.title) || 'breaking news').slice(0, 80));
+  }
+  function fallback() {
+    track.innerHTML = '<span class="ticker-item ticker-fallback">Live headlines appear once the pipeline is running. Open the dashboard for the full trend feed.</span>';
+  }
+  function render(items) {
+    if (!items || !items.length) return fallback();
+    function build(hidden) {
+      return items.map(function (t) {
+        var cat = esc((t.category || '').toUpperCase());
+        var title = esc(t.title || '');
+        var extra = hidden ? ' aria-hidden="true" tabindex="-1"' : '';
+        return '<a class="ticker-item"' + extra + ' href="' + esc(articleUrl(t)) + '" rel="noopener noreferrer">' +
+          (cat ? '<span class="ticker-cat">' + cat + '</span>' : '') +
+          '<span class="ticker-title">' + title + '</span></a>';
+      }).join(sep);
+    }
+    var sep = '<span class="ticker-sep" aria-hidden="true">&#9670;</span>';
+    track.innerHTML = build(false) + sep + build(true);
+    track.style.animationDuration = Math.max(30, items.length * 4) + 's';
+  }
+  fetch('/api/trends/enriched?limit=20', { headers: { 'Accept': 'application/json' } })
+    .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+    .then(function (d) {
+      var list = Array.isArray(d) ? d : (d && Array.isArray(d.data)) ? d.data : ((d && d.data && d.data.trends) || []);
+      render(list);
+    })
+    .catch(fallback);
+})();
+</script>
 </body>
 </html>
