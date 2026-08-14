@@ -15,7 +15,7 @@ logger = logging.getLogger("trends")
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 # ═══ APP (at module level — required by Vercel) ═══
@@ -68,11 +68,11 @@ def _serialize_trend(t):
 # ═══════════════════════════════════════
 
 @app.get("/", response_class=HTMLResponse)
-async def landing():
-    path = os.path.join(ROOT, "landing.html")
+async def home():
+    path = os.path.join(ROOT, "dashboard.html")
     if os.path.exists(path):
         return open(path, encoding="utf-8").read()
-    return HTMLResponse("<h1>Trend Pipeline</h1>", status_code=200)
+    return HTMLResponse("<h1>Dashboard loading...</h1>", status_code=200)
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard():
@@ -80,6 +80,29 @@ async def dashboard():
     if os.path.exists(path):
         return open(path, encoding="utf-8").read()
     return HTMLResponse("<h1>Dashboard loading...</h1>", status_code=200)
+
+@app.get("/robots.txt")
+async def robots():
+    base = os.getenv("SITE_URL", "https://digitalbrief.in").rstrip("/")
+    return Response(
+        content=f"User-agent: *\nAllow: /\n\nSitemap: {base}/sitemap.xml\n",
+        media_type="text/plain",
+    )
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    base = os.getenv("SITE_URL", "https://digitalbrief.in").rstrip("/")
+    urls = [f"{base}/"]
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + ''.join(
+            f"  <url><loc>{u}</loc><changefreq>hourly</changefreq><priority>0.8</priority></url>\n"
+            for u in urls
+        )
+        + '</urlset>'
+    )
+    return Response(content=xml, media_type="application/xml")
 
 # ═══════════════════════════════════════
 # API
@@ -266,7 +289,8 @@ if __name__ == "__main__":
     import uvicorn
     from core.config import HOST, PORT
     print(f"\n  Trend Pipeline v2.0")
-    print(f"  http://{HOST}:{PORT}            Landing")
+    print(f"  http://{HOST}:{PORT}            Home (Dashboard)")
     print(f"  http://{HOST}:{PORT}/dashboard  Dashboard")
     print(f"  http://{HOST}:{PORT}/docs       API Docs\n")
     uvicorn.run("api.index:app", host=HOST, port=PORT, reload=False, log_level="info")
+

@@ -9,7 +9,56 @@
 <link rel="apple-touch-icon" href="/static/favicon.svg">
 <meta name="theme-color" content="#0f0f12">
 
-<title>DigitalBrief — Trend Pipeline Dashboard</title>
+<title>DigitalBrief – Trending News, Topics &amp; Keywords Right Now</title>
+<meta name="description" content="Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.">
+<meta name="keywords" content="trending topics, trending news, trending topics today, trending topics right now, trending keywords, trending keywords today, what's trending today, what's trending right now, latest trending topics, trending searches, search trends, trending news today, breaking news trends, popular topics today, rising search trends, viral topics today, content ideas, technology trends, AI trends, business trends, entertainment trends, social media trends">
+<meta name="author" content="DigitalBrief">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://digitalbrief.in/">
+<meta property="og:site_name" content="DigitalBrief">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DigitalBrief – Trending News, Topics &amp; Keywords Right Now">
+<meta property="og:description" content="Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.">
+<meta property="og:url" content="https://digitalbrief.in/">
+<meta property="og:image" content="https://digitalbrief.in/static/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DigitalBrief – Trending News, Topics &amp; Keywords Right Now">
+<meta name="twitter:description" content="Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.">
+<meta name="twitter:image" content="https://digitalbrief.in/static/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "DigitalBrief",
+  "url": "https://digitalbrief.in/",
+  "description": "Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "DigitalBrief",
+  "url": "https://digitalbrief.in/",
+  "description": "Real-time trend discovery and news intelligence platform.",
+  "slogan": "Discover What's Trending Before Everyone Else."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "DigitalBrief – Trending News, Topics & Keywords Right Now",
+  "url": "https://digitalbrief.in/",
+  "description": "Discover trending news, topics and keywords right now. DigitalBrief tracks rising search trends, breaking stories, AI, technology, business, entertainment and more.",
+  "inLanguage": "en",
+  "isPartOf": { "@type": "WebSite", "name": "DigitalBrief", "url": "https://digitalbrief.in/" }
+}
+</script>
+<script type="application/ld+json" id="trendsJsonLd"></script>
 <style>
   :root {
     --bg: #0f0f12;
@@ -315,13 +364,44 @@
   .video-link-body p { color:var(--text2); font-size:.8rem; line-height:1.45; margin:0 0 .8rem; }
   .publisher-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; background:#22c55e22; color:#22c55e; }
   .video-note { color:var(--text2); font-size:.78rem; margin-top:.8rem; }
+  /* Homepage SEO hero + enhancements (additive) */
+  .header .brand { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+  .header .brand a { color: inherit; text-decoration: none; }
+  .header .brand span { color: var(--accent2); }
+  .seo-hero { padding: 24px 0 12px; }
+  .seo-hero h1 { font-size: clamp(1.55rem, 3.4vw, 2.45rem); font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 10px; background: linear-gradient(135deg, #a29bfe, #6c5ce7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .seo-tagline { font-size: 1.05rem; font-weight: 600; color: var(--accent2); margin-bottom: 10px; }
+  .seo-intro { font-size: 0.95rem; color: var(--text2); line-height: 1.65; max-width: 900px; margin-bottom: 14px; }
+  .kw-cluster { display: flex; flex-wrap: wrap; gap: 8px; }
+  .kw-chip { padding: 6px 13px; border-radius: 100px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+  .kw-chip:hover { color: var(--text); border-color: var(--accent2); }
+  .kw-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .kw-section { margin-bottom: 8px; }
+  .cat-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px; }
+  .cat-card { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; transition: all .2s; font-family: inherit; }
+  .cat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .cat-card.dim { opacity: .45; }
+  .cat-card-name { font-size: .9rem; font-weight: 700; color: var(--text); }
+  .cat-card-count { font-size: .78rem; font-weight: 700; color: var(--accent2); background: var(--surface2); border-radius: 99px; padding: 2px 9px; }
+  .aeo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-bottom: 8px; }
+  .aeo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .aeo-card h3 { font-size: .95rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .aeo-card p { font-size: .82rem; color: var(--text2); line-height: 1.55; }
+  .seo-footer { border-top: 1px solid var(--border); margin-top: 28px; padding: 26px 0 10px; text-align: center; }
+  .seo-footer p { font-size: .82rem; color: var(--text2); line-height: 1.6; margin-bottom: 6px; }
+  .seo-footer a { color: var(--accent2); text-decoration: none; }
+  .seo-footer a:hover { text-decoration: underline; }
+  .seo-footer-links { font-size: .78rem !important; }
+  .seo-footer-kw { font-size: .78rem !important; opacity: .9; }
+  .seo-footer-copy { font-size: .72rem !important; opacity: .8; }
+  @media (max-width: 768px) { .header .brand { font-size: 1.2rem; } .seo-hero h1 { font-size: 1.45rem; } }
 </style>
 </head>
 <body>
 <div class="app">
   <!-- Header -->
   <div class="header">
-    <h1><a href="/" style="color:inherit;text-decoration:none;font-size:.75rem;opacity:.6;margin-right:12px;">← Home</a>📈 DigitalBrief <span>Trend Pipeline</span></h1>
+    <div class="brand"><a href="/" aria-label="DigitalBrief home">📈 DigitalBrief <span>Trend Pipeline</span></a></div>
     <button class="btn btn-sm" onclick="openSubscription()" style="margin-left:auto;" aria-label="Subscribe to news">🔔 Subscribe</button>
     <div class="header-stats" id="headerStats">
       <div class="stat"><div class="stat-value">-</div><div class="stat-label">Total Trends</div></div>
@@ -340,6 +420,28 @@
   <!-- Error Banner (hidden by default) -->
   <div class="error-banner" id="errorBanner" style="display:none;"></div>
 
+  <!-- SEO Hero (homepage) -->
+  <section class="seo-hero" aria-labelledby="seoHeroH1">
+    <h1 id="seoHeroH1">Trending News, Topics &amp; Keywords Right Now</h1>
+    <p class="seo-tagline">Discover What's Trending Before Everyone Else.</p>
+    <p class="seo-intro">DigitalBrief tracks rising topics, keywords, news and search trends across AI, technology, business, entertainment, markets and social media — so you can see what people are talking about right now and turn today's trending topics into timely content ideas.</p>
+    <div class="kw-cluster" id="heroKwCluster" aria-label="Trending topics and keywords">
+      <button type="button" class="kw-chip" data-kw="trending topics">Trending Topics</button>
+      <button type="button" class="kw-chip" data-kw="trending news">Trending News</button>
+      <button type="button" class="kw-chip" data-kw="what's trending today">What's Trending Today</button>
+      <button type="button" class="kw-chip" data-kw="trending keywords">Trending Keywords</button>
+      <button type="button" class="kw-chip" data-kw="trending searches">Trending Searches</button>
+      <button type="button" class="kw-chip" data-kw="search trends">Search Trends</button>
+      <button type="button" class="kw-chip" data-kw="breaking news">Breaking News</button>
+      <button type="button" class="kw-chip" data-kw="content ideas">Content Ideas</button>
+      <button type="button" class="kw-chip" data-kw="technology trends">Technology Trends</button>
+      <button type="button" class="kw-chip" data-kw="AI trends">AI Trends</button>
+      <button type="button" class="kw-chip" data-kw="business trends">Business Trends</button>
+      <button type="button" class="kw-chip" data-kw="entertainment trends">Entertainment Trends</button>
+      <button type="button" class="kw-chip" data-kw="viral topics">Viral Topics</button>
+      <button type="button" class="kw-chip" data-kw="rising search trends">Rising Search Trends</button>
+    </div>
+  </section>
   <!-- Category Navigation -->
   <nav class="cat-nav" id="catNav" aria-label="News categories">
     <button class="cat-chip active" data-cat="all" onclick="filterByCategory('all')">🔥 All</button>
@@ -403,6 +505,19 @@
     <p>Content ideas appear when trends score above the minimum threshold. Adjust the score slider or wait for the next refresh.</p>
   </div>
 
+  <!-- Trending Keywords -->
+  <h2 class="section-title">🔑 Trending Keywords <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(rising keywords &amp; search terms)</span></h2>
+  <div class="kw-section">
+    <div class="kw-cluster" id="trendingKw"></div>
+  </div>
+
+  <!-- Trending Topics by Category -->
+  <h2 class="section-title">🗂️ Trending Topics by Category <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(click a card to filter)</span></h2>
+  <div class="cat-cards" id="catCards"></div>
+
+  <!-- AEO: What's trending Q&A -->
+  <h2 class="section-title">❓ What's Trending? Quick Answers</h2>
+  <div class="aeo-grid" id="aeoGrid"></div>
   <!-- Video News Section -->
   <div class="section-title">📺 News Channels &amp; Live News <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(live TV + official links)</span></div>
   <div class="video-grid" id="videoGrid"></div>
@@ -518,6 +633,7 @@ function updateUI(trendsData, statusData) {
   renderHero();
   renderTrends();
   renderIdeas();
+  renderHomeEnhancements();
 }
 
 // ── Render Top Trending Hero ──
@@ -585,6 +701,9 @@ function renderTrends() {
     filtered = filtered.filter(t => normalizeCat(t.category || 'Technology') === norm);
   }
   filtered = filtered.filter(t => t.trend_score >= currentMinScore);
+  if (currentKeyword) {
+    filtered = filtered.filter(t => kwMatches(t, currentKeyword));
+  }
 
   // Sort
   const sorter = {
@@ -1037,12 +1156,133 @@ function renderNewsChannels() {
 }
 
 // ── Init ──
+// ── Homepage SEO enhancements (additive; existing features untouched) ──
+let currentKeyword = null;
+
+function kwMatches(t, kw) {
+  const q = String(kw).toLowerCase();
+  const hay = ((t.title || '') + ' ' + (t.description || '') + ' ' + (t.related_keywords || []).join(' ')).toLowerCase();
+  return hay.indexOf(q) > -1;
+}
+
+function filterByKeyword(kw) {
+  currentKeyword = (currentKeyword === kw) ? null : kw;
+  document.querySelectorAll('.kw-chip[data-kw]').forEach(b => b.classList.toggle('active', b.dataset.kw === currentKeyword));
+  renderTrends();
+  const grid = document.getElementById('trendsGrid');
+  if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+(function bindHeroKw() {
+  const hk = document.getElementById('heroKwCluster');
+  if (!hk) return;
+  hk.querySelectorAll('.kw-chip[data-kw]').forEach(b => b.addEventListener('click', () => filterByKeyword(b.dataset.kw)));
+})();
+
+function renderTrendingKeywords() {
+  const el = document.getElementById('trendingKw');
+  if (!el) return;
+  const seen = new Set();
+  const kws = [];
+  [...allTrends].sort((a, b) => (b.trend_score || 0) - (a.trend_score || 0)).forEach(t => {
+    (t.related_keywords || []).forEach(k => {
+      const key = String(k).trim().toLowerCase();
+      if (key && !seen.has(key) && kws.length < 24) { seen.add(key); kws.push(k); }
+    });
+  });
+  el.innerHTML = kws.map(k => `<button type="button" class="kw-chip${currentKeyword === k ? ' active' : ''}" data-kw="${escapeHtml(k)}">${escapeHtml(k)}</button>`).join('');
+  el.querySelectorAll('.kw-chip[data-kw]').forEach(b => {
+    b.addEventListener('click', () => filterByKeyword(b.dataset.kw));
+  });
+}
+
+const CAT_CARDS = [
+  { label: 'AI', target: 'AI' },
+  { label: 'Technology', target: 'Technology' },
+  { label: 'Business', target: 'Business & Finance' },
+  { label: 'Finance', target: 'Business & Finance' },
+  { label: 'Entertainment', target: 'Entertainment' },
+  { label: 'Hollywood', target: 'Entertainment' },
+  { label: 'Sports', target: 'Sports' },
+  { label: 'Politics', target: 'Politics' },
+  { label: 'Science', target: 'Science & Health' },
+  { label: 'Health', target: 'Science & Health' },
+  { label: 'Lifestyle', target: 'Lifestyle' },
+  { label: 'Social Media', target: 'Social Media' },
+];
+
+function renderCatCards() {
+  const el = document.getElementById('catCards');
+  if (!el) return;
+  el.innerHTML = CAT_CARDS.map(c => {
+    const n = normalizeCat(c.target);
+    const count = allTrends.filter(t => normalizeCat(t.category || 'Technology') === n).length;
+    return `<button type="button" class="cat-card${count ? '' : ' dim'}" data-target="${escapeHtml(c.target)}" data-count="${count}" title="${count ? escapeHtml(c.label) + ': ' + count + ' stories \u2014 click to filter' : escapeHtml(c.label) + ': no live stories yet \u2014 opens Google News'}" aria-label="${escapeHtml(c.label)}: ${count} trending topics${count ? '' : ' (opens Google News search)'}">
+      <span class="cat-card-name">${escapeHtml(c.label)}</span><span class="cat-card-count">${count}</span></button>`;
+  }).join('');
+  el.querySelectorAll('.cat-card').forEach(b => {
+    b.addEventListener('click', () => {
+      const count = parseInt(b.dataset.count || '0', 10);
+      if (count > 0) {
+        filterByCategory(b.dataset.target);
+        const grid = document.getElementById('trendsGrid');
+        if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.location.href = 'https://news.google.com/search?q=' + encodeURIComponent(b.dataset.target + ' trends');
+      }
+    });
+  });
+}
+
+function renderAeo() {
+  const el = document.getElementById('aeoGrid');
+  if (!el) return;
+  const byScore = [...allTrends].sort((a, b) => (b.trend_score || 0) - (a.trend_score || 0));
+  const top3 = byScore.slice(0, 3);
+  const topg = [...allTrends].filter(t => t.growth_percentage != null).sort((a, b) => (b.growth_percentage || -1) - (a.growth_percentage || -1)).slice(0, 3);
+  const counts = {};
+  allTrends.forEach(t => { const k = t.category || 'Technology'; counts[k] = (counts[k] || 0) + 1; });
+  const topCats = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const kwSeen = new Set();
+  const kws = [];
+  byScore.forEach(t => (t.related_keywords || []).forEach(k => { const key = String(k).trim().toLowerCase(); if (key && !kwSeen.has(key) && kws.length < 5) { kwSeen.add(key); kws.push(k); } }));
+  const joinTitles = arr => arr.map(t => t.title).join('; ');
+  const qa = [
+    { q: 'What is trending right now?', a: top3.length ? 'The trending topics right now are ' + joinTitles(top3) + '.' : 'Trend data is loading — refresh in a moment.' },
+    { q: "What are today's top trending topics?", a: topCats.length ? "Today's top trending topic categories are " + topCats.map(([k, v]) => k + ' (' + v + ')').join(', ') + '.' : 'Trend data is loading — refresh in a moment.' },
+    { q: 'What keywords are trending today?', a: kws.length ? 'Trending keywords today include ' + kws.join(', ') + '.' : 'Trend data is loading — refresh in a moment.' },
+    { q: 'What news is trending today?', a: top3.length ? 'Trending news today includes ' + top3.map(t => t.title + (t.publisher ? ' (' + t.publisher + ')' : '')).join('; ') + '.' : 'Trend data is loading — refresh in a moment.' },
+    { q: 'What topics are gaining popularity?', a: topg.length ? 'Popular topics today — the fastest-rising include ' + topg.map(t => t.title + ' (+' + t.growth_percentage + '%)').join('; ') + '.' : 'Trend data is loading — refresh in a moment.' },
+  ];
+  el.innerHTML = qa.map(x => '<div class="aeo-card"><h3>' + escapeHtml(x.q) + '</h3><p>' + escapeHtml(x.a) + '</p></div>').join('');
+}
+
+function renderHomeEnhancements() {
+  renderTrendingKeywords();
+  renderCatCards();
+  renderAeo();
+  const ld = document.getElementById('trendsJsonLd');
+  if (ld && allTrends.length) {
+    const items = [...allTrends].sort((a, b) => (b.trend_score || 0) - (a.trend_score || 0)).slice(0, 12).map((t, i) => ({
+      '@type': 'ListItem', position: i + 1, name: t.title,
+      url: (t.url && t.url !== '#') ? t.url : 'https://www.google.com/search?q=' + encodeURIComponent(t.title || ''),
+    }));
+    ld.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Trending Now', itemListElement: items });
+  }
+}
 renderNewsChannels();
 fetchData();
 refreshTimerId = setInterval(autoTick, AUTO_CFG.POLL_MS); // auto-update (manual + auto share one guard)
 scheduleSubscription();
 </script>
 
+<!-- Footer -->
+<footer class="seo-footer" role="contentinfo">
+  <p><strong>DigitalBrief</strong> — Discover what's trending before everyone else. Real-time trending news, trending topics, trending keywords, search trends, breaking news and content ideas — updated automatically every 30 minutes.</p>
+  <p class="seo-footer-kw">Trending topics today · Trending topics right now · Trending keywords today · What's trending today · Latest trending topics · Trending searches · Trending news today · Breaking news trends · Popular topics today · Rising search trends · Viral topics today · Technology trends · AI trends · Business trends · Entertainment trends · Social media trends</p>
+  <p class="seo-footer-links"><a href="/">Home</a> · <a href="/dashboard">Dashboard</a> · <a href="/api/trends/top?n=10" rel="noopener">Top Trends API</a> · <a href="/robots.txt">robots.txt</a> · <a href="/sitemap.xml">Sitemap</a></p>
+  <p class="seo-footer-copy">© 2026 DigitalBrief. Powered by Google Trends, GNews, Mediastack, Currents API, NewsAPI, Reddit &amp; 18 RSS feeds.</p>
+</footer>
 <!-- Subscription Popup -->
 <div class="sub-overlay" id="subOverlay" role="dialog" aria-modal="true" aria-label="Subscribe to trending news">
   <div class="sub-box">
