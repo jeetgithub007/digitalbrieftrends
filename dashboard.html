@@ -460,6 +460,23 @@
   .sport-score { font-weight:700; font-variant-numeric:tabular-nums; }
   .skeleton .pulse-block { height:14px; margin-bottom:10px; border-radius:8px; background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent); background-size:200% 100%; animation:pulse 1.5s infinite; }
   .skeleton .pulse-block.tall { height:48px; }
+  /* Content layout: main news column + sticky widgets sidebar */
+  .content-layout { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:18px; align-items:start; margin-top:8px; }
+  .content-main { min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .widgets-sidebar { position:sticky; top:14px; display:flex; flex-direction:column; gap:14px; min-width:0; }
+  .widgets-sidebar .widgets-grid { grid-template-columns:1fr; gap:14px; }
+  .sidebar-title { font-size:1rem; font-weight:800; color:var(--text); margin:0; line-height:1.3; }
+  .sidebar-sub { display:block; font-size:.68rem; font-weight:400; color:var(--text2); margin-top:3px; }
+  .widgets-sidebar .weather-card, .widgets-sidebar .sports-card { grid-column:auto; }
+  .widgets-sidebar .widget-card { padding:14px 16px; }
+  .widgets-sidebar .wx-temp { font-size:2.1rem; }
+  .widgets-sidebar .wx-strip { gap:4px; }
+  .widgets-sidebar .stock-row { padding:7px 0; }
+  .widgets-sidebar .match-row { padding:7px 0; }
+  @media (max-width: 1120px) {
+    .content-layout { grid-template-columns:1fr; }
+    .widgets-sidebar { position:static; }
+  }
   .video-link-body { padding:.1rem .9rem .9rem; }
   .video-link-body p { color:var(--text2); font-size:.8rem; line-height:1.45; margin:0 0 .8rem; }
   .publisher-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:.68rem; font-weight:700; background:#22c55e22; color:#22c55e; }
@@ -540,16 +557,8 @@
   <h2 class="section-title">🗂️ Trending Topics by Category <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(click a card to filter)</span></h2>
   <div class="cat-cards" id="catCards"></div>
 
-  <!-- Live Widgets (real-time data, no fake content) -->
-  <section class="widgets-section" aria-label="Live widgets: weather, markets, cricket and sports">
-    <h2 class="section-title">📊 Live Widgets <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(real-time · weather, markets, cricket &amp; sports)</span></h2>
-    <div class="widgets-grid" id="widgetsGrid">
-      <div class="widget-card skeleton"><div class="pulse-block tall"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
-      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
-      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
-      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
-    </div>
-  </section>
+  <div class="content-layout">
+  <div class="content-main">
   <!-- Category Navigation -->
   <nav class="cat-nav" id="catNav" aria-label="News categories">
     <button class="cat-chip active" data-cat="all" onclick="filterByCategory('all')">🔥 All</button>
@@ -634,6 +643,17 @@
   <p class="video-note">Channels are configurable — you can add or swap your preferred news channels anytime.</p>
 </div>
 
+  </div>
+  <aside class="widgets-sidebar" aria-label="Live widgets: weather, markets, cricket and sports">
+    <h2 class="sidebar-title">📊 Live Widgets<span class="sidebar-sub">real-time · weather · markets · cricket · sports</span></h2>
+    <div class="widgets-grid" id="widgetsGrid">
+      <div class="widget-card skeleton"><div class="pulse-block tall"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+      <div class="widget-card skeleton"><div class="pulse-block"></div><div class="pulse-block"></div><div class="pulse-block"></div></div>
+    </div>
+  </aside>
+  </div>
 <script>
 // ── State ──
 let allTrends = [];
@@ -1580,6 +1600,7 @@ renderNewsChannels();
 fetchData();
 refreshTimerId = setInterval(autoTick, AUTO_CFG.POLL_MS); // auto-update (manual + auto share one guard)
 scheduleSubscription();
+
 </script>
 
 <!-- Footer -->
