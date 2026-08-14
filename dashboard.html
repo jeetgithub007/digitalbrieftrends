@@ -157,6 +157,10 @@
     display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
     gap: 14px;
   }
+  .cat-group { grid-column: 1 / -1; }
+  .cat-group-title { display:flex; align-items:center; gap:8px; font-size:1rem; font-weight:800; color:var(--text); margin:20px 0 10px; letter-spacing:-0.2px; }
+  .cat-group-title .cat-count { font-size:0.72rem; font-weight:500; color:var(--text2); background:var(--surface); border:1px solid var(--border); padding:2px 9px; border-radius:99px; }
+  .cat-group-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:14px; }
   .trend-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -267,6 +271,7 @@
     .app { padding: 12px; }
     .header h1 { font-size: 1.2rem; }
     .trends-grid { grid-template-columns: 1fr; }
+    .cat-group-grid { grid-template-columns: 1fr; }
     .ideas-grid { grid-template-columns: 1fr; }
     .controls { flex-direction: column; align-items: stretch; }
     .score-slider { margin-left: 0; }
@@ -465,6 +470,10 @@
       </div>
     </div>
   </section>
+
+  <!-- Trending Topics by Category -->
+  <h2 class="section-title">🗂️ Trending Topics by Category <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(click a card to filter)</span></h2>
+  <div class="cat-cards" id="catCards"></div>
   <!-- Category Navigation -->
   <nav class="cat-nav" id="catNav" aria-label="News categories">
     <button class="cat-chip active" data-cat="all" onclick="filterByCategory('all')">🔥 All</button>
@@ -539,9 +548,6 @@
     <div class="kw-cluster" id="trendingKw"></div>
   </div>
 
-  <!-- Trending Topics by Category -->
-  <h2 class="section-title">🗂️ Trending Topics by Category <span style="font-size:0.75rem;color:var(--text2);font-weight:400">(click a card to filter)</span></h2>
-  <div class="cat-cards" id="catCards"></div>
 
   <!-- AEO: What's trending Q&A -->
   <h2 class="section-title">❓ What's Trending? Quick Answers</h2>
@@ -747,54 +753,84 @@ function renderTrends() {
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
-        <div class="icon">🔍</div>
+        <div class="icon">📭</div>
         <h3>No trends match your filters</h3>
         <p>Try lowering the minimum score or selecting a different category.</p>
       </div>`;
     return;
   }
 
-  grid.innerHTML = filtered.map(t => {
-    const sources = (t.sources || [t.source || '']).filter(Boolean);
-    const pubBadge = t.publisher ? `<span class="publisher-badge">${escapeHtml(t.publisher)}</span>` : '';
-    const badgeHtml = pubBadge + sources.map(s => 
-      `<span class="source-badge ${s}">${s.replace('_',' ')}</span>`
-    ).join('');
-    const cat = t.category || 'Technology';
-    const growth = t.growth_percentage != null ? `<span class="growth-badge ${t.growth_percentage > 0 ? 'up' : 'down'}">${t.growth_percentage > 0 ? '+' : ''}${t.growth_percentage}%</span>` : '';
-    const seo = t.seo_score != null ? `<span class="seo-badge" title="SEO potential">SEO ${t.seo_score}</span>` : '';
-    const kws = (t.related_keywords || []).slice(0, 5).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('');
-    const img = t.image_url ? `<img class="trend-img" src="${t.image_url}" alt="${escapeHtml(t.title)}" loading="lazy" onerror="this.style.display='none'">` : '';
+  // Single-category (or any active filter): flat list as before
+  if (currentCategory !== 'all') {
+    grid.innerHTML = filtered.map(t => trendCardHtml(t)).join('');
+    return;
+  }
 
-    return `
-      <div class="trend-card" data-rank="${t.rank}">
-        ${img}
-        <div class="trend-badges">
-          <span class="category-badge">${escapeHtml(cat)}</span>
-          ${growth}
-          ${seo}
-        </div>
-        <span class="trend-rank ${t.rank <= 3 ? 'top' : ''}">#${t.rank}</span>
-        <span class="trend-score">${t.trend_score}</span>
-        <div class="trend-title">
-          ${(() => { const url = t.url && t.url !== '#' ? t.url : 'https://www.google.com/search?q=' + encodeURIComponent(t.title); return `<a href="${url}" rel="noopener">${escapeHtml(t.title)}</a>`; })()}
-        </div>
-        <div class="trend-meta">
-          ${badgeHtml}
-          ${t.subreddit ? `<span>r/${t.subreddit}</span>` : ''}
-          ${t.published_at ? `<span>${formatDate(t.published_at)}</span>` : ''}
-        </div>
-        ${t.description ? `<div class="trend-description">${escapeHtml(t.description)}</div>` : ''}
-        ${kws ? `<div class="trend-keywords">${kws}</div>` : ''}
-        <div class="trend-actions">
-          <button class="action-btn" onclick="viewDetails(${t.rank})">👁 Details</button>
-          <button class="action-btn" onclick="generateArticle(${t.rank})">📝 Article</button>
-          <button class="action-btn" onclick="generateSocial(${t.rank})">📣 Post</button>
-          <button class="action-btn ${t.saved ? 'saved' : ''}" id="save-${t.rank}" onclick="saveTrend(${t.rank})">${t.saved ? '★ Saved' : '☆ Save'}</button>
-          <button class="action-btn dismiss" onclick="dismissTrend(${t.rank})">✕ Dismiss</button>
-        </div>
-      </div>`;
-  }).join('');
+  // All view: group cards by category (CAT_CARDS order first, extras by count)
+  const buckets = new Map();
+  const order = [];
+  const seen = new Set();
+  CAT_CARDS.forEach(c => {
+    const n = normalizeCat(c.target);
+    if (!seen.has(n)) { seen.add(n); order.push({ norm: n, label: c.target }); }
+  });
+  filtered.forEach(t => {
+    const norm = normalizeCat(t.category || 'Technology');
+    if (!seen.has(norm)) { seen.add(norm); order.push({ norm, label: t.category || norm }); }
+    if (!buckets.has(norm)) buckets.set(norm, []);
+    buckets.get(norm).push(t);
+  });
+  const groups = order
+    .map(o => ({ label: o.label, items: buckets.get(o.norm) || [] }))
+    .filter(g => g.items.length);
+
+  grid.innerHTML = groups.map(g => `
+    <div class="cat-group">
+      <h3 class="cat-group-title">${escapeHtml(g.label)} <span class="cat-count">${g.items.length} ${g.items.length === 1 ? 'story' : 'stories'}</span></h3>
+      <div class="cat-group-grid">${g.items.map(t => trendCardHtml(t)).join('')}</div>
+    </div>`).join('');
+}
+
+function trendCardHtml(t) {
+  const sources = (t.sources || [t.source || '']).filter(Boolean);
+  const pubBadge = t.publisher ? `<span class="publisher-badge">${escapeHtml(t.publisher)}</span>` : '';
+  const badgeHtml = pubBadge + sources.map(s =>
+    `<span class="source-badge ${s}">${s.replace('_',' ')}</span>`
+  ).join('');
+  const cat = t.category || 'Technology';
+  const growth = t.growth_percentage != null ? `<span class="growth-badge ${t.growth_percentage > 0 ? 'up' : 'down'}">${t.growth_percentage > 0 ? '+' : ''}${t.growth_percentage}%</span>` : '';
+  const seo = t.seo_score != null ? `<span class="seo-badge" title="SEO potential">SEO ${t.seo_score}</span>` : '';
+  const kws = (t.related_keywords || []).slice(0, 5).map(k => `<span class="kw-chip">${escapeHtml(k)}</span>`).join('');
+  const img = t.image_url ? `<img class="trend-img" src="${t.image_url}" alt="${escapeHtml(t.title)}" loading="lazy" onerror="this.style.display='none'">` : '';
+
+  return `
+    <div class="trend-card" data-rank="${t.rank}">
+      ${img}
+      <div class="trend-badges">
+        <span class="category-badge">${escapeHtml(cat)}</span>
+        ${growth}
+        ${seo}
+      </div>
+      <span class="trend-rank ${t.rank <= 3 ? 'top' : ''}">#${t.rank}</span>
+      <span class="trend-score">${t.trend_score}</span>
+      <div class="trend-title">
+        ${(() => { const url = t.url && t.url !== '#' ? t.url : 'https://www.google.com/search?q=' + encodeURIComponent(t.title); return `<a href="${url}" rel="noopener">${escapeHtml(t.title)}</a>`; })()}
+      </div>
+      <div class="trend-meta">
+        ${badgeHtml}
+        ${t.subreddit ? `<span>r/${t.subreddit}</span>` : ''}
+        ${t.published_at ? `<span>${formatDate(t.published_at)}</span>` : ''}
+      </div>
+      ${t.description ? `<div class="trend-description">${escapeHtml(t.description)}</div>` : ''}
+      ${kws ? `<div class="trend-keywords">${kws}</div>` : ''}
+      <div class="trend-actions">
+        <button class="action-btn" onclick="viewDetails(${t.rank})">🔎 Details</button>
+        <button class="action-btn" onclick="generateArticle(${t.rank})">📝 Article</button>
+        <button class="action-btn" onclick="generateSocial(${t.rank})">🐦 Post</button>
+        <button class="action-btn ${t.saved ? 'saved' : ''}" id="save-${t.rank}" onclick="saveTrend(${t.rank})">${t.saved ? '✅ Saved' : '🔖 Save'}</button>
+        <button class="action-btn dismiss" onclick="dismissTrend(${t.rank})">✕ Dismiss</button>
+      </div>
+    </div>`;
 }
 
 // ── Render Content Ideas ──
