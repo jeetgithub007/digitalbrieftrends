@@ -27,10 +27,30 @@ NEWSAPI_KEY = os.getenv("NEWSAPI_KEY", "")
 REDDIT_CLIENT_ID = os.getenv("REDDIT_CLIENT_ID", "")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "")
 
+# ---- News API Keys (added 2026-08-14) ----
+WEBZIO_API_KEY = os.getenv("WEBZIO_API_KEY", "")
+APITUBE_API_KEY = os.getenv("APITUBE_API_KEY", "")
+THENEWS_API_KEY = os.getenv("THENEWS_API_KEY", "")
+NYT_API_KEY = os.getenv("NYT_API_KEY", "")
+NYT_APP_ID = os.getenv("NYT_APP_ID", "")
+MEDIACLOUD_API_KEY = os.getenv("MEDIACLOUD_API_KEY", "")
+
 # ---- APT Limits ----
 MEDIASTACK_LIMIT = 20
 GNEWS_LIMIT = 20
 CURRENTS_LIMIT = 20
+
+# ---- News API Limits (added 2026-08-14) ----
+WEBZIO_LIMIT = 20       # posts per request (Lite plan)
+WEBZIO_TIMEOUT = 25
+APITUBE_LIMIT = 25      # max per request
+APITUBE_TIMEOUT = 25
+THENEWS_LIMIT = 25      # free tier max per request
+THENEWS_TIMEOUT = 25
+NYT_LIMIT = 40          # top stories returned
+NYT_TIMEOUT = 25
+MEDIACLOUD_LIMIT = 30   # stories per request
+MEDIACLOUD_TIMEOUT = 25
 
 # ---- Reddit ----
 REDDIT_USER_AGENT = "DigitalBrief/1.0"
@@ -156,7 +176,10 @@ CONTENT_KEYWORDS = [
 TREND_SCORE_WEIGHTS = {
     "rss": 40, "gnews": 38, "mediastack": 36, "newsapi": 35,
     "currents": 34, "reddit": 32, "google_trends": 12,
+    # Added 2026-08-14: five new news APIs
+    "webzio": 36, "thenewsapi": 35, "apitube": 34, "nytimes": 33,
+    "mediacloud": 30,
 }
 MULTI_SOURCE_BONUS = 25
-MAX_TRENDS = 150
+MAX_TRENDS = 250
 REFRESH_INTERVAL_MINUTES = 30

@@ -180,7 +180,9 @@ async def api_refresh():
         await run_pipeline()
         return {"status": "ok"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        import re as _re
+        safe = _re.sub(r"https?://\S+", "<url>", str(e))[:200]
+        return {"status": "error", "message": safe}
 
 
 # ═══════════════════════════════════════

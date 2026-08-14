@@ -472,7 +472,7 @@
 
   <!-- Controls -->
   <div class="controls">
-    <button class="btn active" data-source="all" onclick="filterSourceAll()">All (7)</button>
+    <button class="btn active" data-source="all" onclick="filterSourceAll()">All (12)</button>
     <button class="btn" data-source="google_trends" onclick="filterSource('google_trends')">Google</button>
     <button class="btn" data-source="mediastack" onclick="filterSource('mediastack')">Mediastack</button>
     <button class="btn" data-source="gnews" onclick="filterSource('gnews')">GNews</button>
@@ -480,6 +480,11 @@
     <button class="btn" data-source="newsapi" onclick="filterSource('newsapi')">NewsAPI</button>
     <button class="btn" data-source="reddit" onclick="filterSource('reddit')">Reddit</button>
     <button class="btn" data-source="rss" onclick="filterSource('rss')">RSS</button>
+    <button class="btn" data-source="webzio" onclick="filterSource('webzio')">Webz.io</button>
+    <button class="btn" data-source="apitube" onclick="filterSource('apitube')">APITube</button>
+    <button class="btn" data-source="thenewsapi" onclick="filterSource('thenewsapi')">TheNewsAPI</button>
+    <button class="btn" data-source="nytimes" onclick="filterSource('nytimes')">NYTimes</button>
+    <button class="btn" data-source="mediacloud" onclick="filterSource('mediacloud')">MediaCloud</button>
     <div class="score-slider">
       <label for="minScore">Min Score:</label>
       <input type="range" id="minScore" min="0" max="100" value="0" oninput="filterByScore(this.value)">
@@ -1304,7 +1309,7 @@ scheduleSubscription();
   <p><svg class="footer-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect x="2" y="2" width="60" height="60" rx="16" fill="#15151c"/><rect x="2" y="2" width="60" height="60" rx="16" fill="#8b5cf6" opacity="0.22"/><rect x="2.5" y="2.5" width="59" height="59" rx="15.5" fill="none" stroke="#a78bfa" stroke-width="1.6"/><path d="M44.1 15.8 A9.5 9.5 0 0 1 56.2 27.9" fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round"/><path d="M46.9 17.2 A6.2 6.2 0 0 1 54.2 24.5" fill="none" stroke="#a78bfa" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/><polyline points="12,46 22,46 28,32 34,38 42,22 48,26" fill="none" stroke="#eef2ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="26" r="4.2" fill="#22d3ee"/><circle cx="48" cy="26" r="7.4" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.55"/><circle cx="12" cy="46" r="2.4" fill="#a78bfa" opacity="0.9"/><circle cx="22" cy="46" r="2.4" fill="#818cf8" opacity="0.8"/></svg><strong>DigitalBrief</strong> — Discover what's trending before everyone else. Real-time trending news, trending topics, trending keywords, search trends, breaking news and content ideas — updated automatically every 30 minutes.</p>
   <p class="seo-footer-kw">Trending topics today · Trending topics right now · Trending keywords today · What's trending today · Latest trending topics · Trending searches · Trending news today · Breaking news trends · Popular topics today · Rising search trends · Viral topics today · Technology trends · AI trends · Business trends · Entertainment trends · Social media trends</p>
   <p class="seo-footer-links"><a href="/">Home</a> · <a href="/dashboard">Dashboard</a> · <a href="/api/trends/top?n=10" rel="noopener">Top Trends API</a> · <a href="/robots.txt">robots.txt</a> · <a href="/sitemap.xml">Sitemap</a></p>
-  <p class="seo-footer-copy">© 2026 DigitalBrief. Powered by Google Trends, GNews, Mediastack, Currents API, NewsAPI, Reddit &amp; 18 RSS feeds.</p>
+  <p class="seo-footer-copy">© 2026 DigitalBrief. Powered by Google Trends, GNews, Mediastack, Currents API, NewsAPI, Reddit, Webz.io, APITube, The News API, NYTimes, MediaCloud &amp; 18 RSS feeds.s.</p>
 </footer>
 <!-- Subscription Popup -->
 <div class="sub-overlay" id="subOverlay" role="dialog" aria-modal="true" aria-label="Subscribe to trending news">

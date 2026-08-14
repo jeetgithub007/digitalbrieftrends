@@ -1,2 +1,5 @@
 # Exclude local-only files from Vercel
 server.py
+# Secrets - never upload
+.env
+.env.local

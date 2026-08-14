@@ -8,9 +8,23 @@ from fetchers.gnews import fetch_gnews
 from fetchers.currents import fetch_currents
 from fetchers.rss import fetch_rss
 from fetchers.google_trends import fetch_google_trends
+from fetchers.webzio import fetch_webzio
+from fetchers.apitube import fetch_apitube
+from fetchers.thenewsapi import fetch_thenewsapi
+from fetchers.nytimes import fetch_nytimes
+from fetchers.mediacloud import fetch_mediacloud
 
 logger = logging.getLogger("trends.engine")
 aggregator = TrendAggregator(TREND_SCORE_WEIGHTS, MULTI_SOURCE_BONUS, MAX_TRENDS)
+
+
+import re as _re
+
+
+def _sanitize_err(e):
+    """Strip URLs (and any query-string API keys) from error text before it
+    can reach logs or the dashboard's 'recent errors' list."""
+    return _re.sub(r"https?://\S+", "<url>", str(e))[:200]
 
 
 # Serializes all pipeline runs (background loop, manual refresh, auto refresh)
@@ -25,7 +39,7 @@ async def run_pipeline():
 
 async def _run_pipeline_locked():
     logger.info("=" * 50)
-    logger.info("Pipeline started (7 sources)")
+    logger.info("Pipeline started (12 sources)")
     sources = {}
 
     async with aiohttp.ClientSession() as session:
@@ -33,8 +47,8 @@ async def _run_pipeline_locked():
             try:
                 return name, await coro
             except Exception as e:
-                logger.error(f"{name}: {e}")
-                cache.add_error(f"{name}: {e}")
+                logger.error(f"{name}: {_sanitize_err(e)}")
+                cache.add_error(f"{name}: {_sanitize_err(e)}")
                 return name, []
 
         tasks = [
@@ -42,8 +56,13 @@ async def _run_pipeline_locked():
             safe("gnews", fetch_gnews(session, GNEWS_KEY, GNEWS_LIMIT)),
             safe("currents", fetch_currents(session, CURRENTS_KEY, CURRENTS_LIMIT)),
             safe("rss", fetch_rss(RSS_FEEDS)),
+            safe("webzio", fetch_webzio(session, WEBZIO_API_KEY, WEBZIO_LIMIT, WEBZIO_TIMEOUT)),
+            safe("apitube", fetch_apitube(session, APITUBE_API_KEY, APITUBE_LIMIT, APITUBE_TIMEOUT)),
+            safe("thenewsapi", fetch_thenewsapi(session, THENEWS_API_KEY, THENEWS_LIMIT, THENEWS_TIMEOUT)),
+            safe("nytimes", fetch_nytimes(session, NYT_API_KEY, NYT_LIMIT, NYT_TIMEOUT, NYT_APP_ID)),
+            safe("mediacloud", fetch_mediacloud(session, MEDIACLOUD_API_KEY, MEDIACLOUD_LIMIT, MEDIACLOUD_TIMEOUT)),
         ]
-        for name, data in await asyncio.gather(*tasks):
+        for name, data in await asyncio.wait_for(asyncio.gather(*tasks), timeout=90):
             sources[name] = data
             logger.info(f"  {name}: {len(data)} items")
 
@@ -93,6 +112,8 @@ async def _run_pipeline_locked():
     except Exception as e:
         logger.error(f"Google Trends: {e}")
         sources["google_trends"] = []
+
+    cache.set_source_counts({n: len(v) for n, v in sources.items()})
 
     # Aggregate
     trends = aggregator.merge_and_score(sources)

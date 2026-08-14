@@ -1,7 +1,7 @@
 # Trend Pipeline — Trend Intelligence & Content Enrichment System
 
 Multi-source trend aggregation with intelligent enrichment — fetches trending topics
-from Google Trends, NewsAPI, Mediastack, GNews, Currents, Reddit, and RSS feeds,
+from Google Trends, NewsAPI, Mediastack, GNews, Currents, Reddit, RSS feeds, and 5 more news APIs (Webz.io, APITube, The News API, NYTimes, MediaCloud) - see .env.example for the keys,
 deduplicates, scores, **enriches** each trend (category, growth, description, image,
 related keywords/topics, SEO score), and serves everything via a REST API + live dashboard.
 
@@ -199,6 +199,11 @@ with graceful fallbacks when they're missing.
 | Currents | `CURRENTS_KEY` | News API |
 | NewsAPI | `NEWSAPI_KEY` | News headlines |
 | Reddit | `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | Script app |
+| Webz.io (Lite) | `WEBZIO_API_KEY` | News API (throttled to 1 call/hour) |
+| APITube | `APITUBE_API_KEY` | News API |
+| The News API | `THENEWS_API_KEY` | News API |
+| NYTimes | `NYT_API_KEY` (+ `NYT_APP_ID`) | Top Stories API |
+| MediaCloud | `MEDIACLOUD_API_KEY` | Best-effort; endpoint unverified |
 
 Google Trends + RSS feeds require no keys and always work.
 

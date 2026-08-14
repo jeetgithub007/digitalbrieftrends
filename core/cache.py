@@ -12,12 +12,17 @@ class TrendCache:
         self._errors = []
         self._saved = set()
         self._dismissed = set()
+        self._source_counts = {}
 
     def update(self, data):
         with self._lock:
             self._data = data
             self._updated_at = time.time()
             self._count += 1
+
+    def set_source_counts(self, counts):
+        with self._lock:
+            self._source_counts = dict(counts or {})
 
     def get(self):
         with self._lock:
@@ -44,6 +49,7 @@ class TrendCache:
                 "age_seconds": round(age, 1) if age else None,
                 "refresh_count": self._count,
                 "total_trends": len(self._data) if self._data else 0,
+                "sources": dict(self._source_counts),
                 "recent_errors": self._errors[-5:] if self._errors else [],
                 "saved_count": len(self._saved),
                 "dismissed_count": len(self._dismissed),
