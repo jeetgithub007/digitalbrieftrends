@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>DigitalBrief — Technology Intelligence & Editorial Publication</title>
+    <meta name="description" content="Real-time technology intelligence, breaking news aggregation, AI insights, cybersecurity analysis, and market trends powered by DigitalBrief.">
+    <meta name="keywords" content="technology news, AI trends, market intelligence, tech startups, cybersecurity, gadgets, india news, digitalbrief">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://digitalbrief.in/">
+    <meta property="og:title" content="DigitalBrief — Intelligence & Editorial Publication">
+    <meta property="og:description" content="Real-time technology intelligence, breaking news aggregation, AI insights, and market trend analysis.">
+    <meta property="og:image" content="/static/favicon.svg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Supabase Auth SDK & Client Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/static/js/supabase_auth.js"></script>
+
+    <style>
+        :root {
+            --bg-body: #050811;
+            --bg-surface: #0a0e1a;
+            --bg-card: #0f172a;
+            --bg-card-hover: #152038;
+            --bg-glass: rgba(15, 23, 42, 0.75);
+            --bg-nav: rgba(5, 8, 17, 0.92);
+            --border-color: #1e293b;
+            --border-glow: rgba(99, 102, 241, 0.3);
+            
+            --accent-primary: #6366f1;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-purple: #a855f7;
+            --accent-amber: #f59e0b;
+            --accent-orange: #f97316;
+            --accent-rose: #f43f5e;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --touch-target: 44px;
+        }
+
+        /* ════════════════════════════════════════════════════════════
+           MOBILE-FIRST BASE REPOSITORY STYLES (Default 320px - 767px)
+           ════════════════════════════════════════════════════════════ */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        a:hover { text-decoration: none; }
+
+        /* Container (Mobile Baseline) */
+        .container {
+            width: 100%;
+            max-width: 1340px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Mobile Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-nav);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            height: 64px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
+            color: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .brand-icon-box {
+            width: 36px;
+            height: 36px;
+            background: radial-gradient(circle at 30% 30%, #1e293b, #090d16);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
+            flex-shrink: 0;
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.15rem;
+            background: linear-gradient(135deg, #ffffff 30%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text-highlight {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-badge-tech {
+            display: none;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-emerald);
+            animation: techPulse 2s infinite;
+        }
+
+        @keyframes techPulse {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.3); }
+            100% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        /* Mobile Touch-Scrollable Navigation Bar */
+        nav.main-nav {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 0;
+        }
+        nav.main-nav::-webkit-scrollbar { display: none; }
+
+        nav.main-nav a {
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            position: relative;
+            padding: 6px 8px;
+            display: inline-block;
+            min-height: 36px;
+            line-height: 24px;
+        }
+
+        nav.main-nav a:hover, nav.main-nav a.active {
+            color: #ffffff;
+        }
+
+        nav.main-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 8px;
+            right: 8px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-cyan));
+            border-radius: 2px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            min-height: var(--touch-target);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-decoration: none !important;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-primary:active, .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:active, .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* Mobile Live Broadcast Ticker Bar */
+        .ticker-bar {
+            background: #030610;
+            border-bottom: 1px solid var(--border-color);
+            height: 42px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 -2px 10px rgba(0,0,0,0.6);
+        }
+
+        .ticker-label {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 30;
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            border-right: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 800;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a5b4fc;
+            box-shadow: 6px 0 16px rgba(0, 0, 0, 0.7);
+            flex-shrink: 0;
+        }
+
+        .ticker-label .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #f43f5e;
+            box-shadow: 0 0 10px #f43f5e;
+        }
+
+        .ticker-viewport {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding-left: 115px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-track {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            will-change: transform;
+            animation: tickerMarquee 38s linear infinite;
+        }
+
+        .ticker-bar:hover .ticker-track, .ticker-bar:active .ticker-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes tickerMarquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 0 18px;
+            cursor: pointer;
+            text-decoration: none !important;
+            min-height: var(--touch-target);
+        }
+
+        .ticker-item-title {
+            color: #f8fafc;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .ticker-item:hover .ticker-item-title {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .ticker-score-badge {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+        }
+
+        .ticker-divider {
+            color: #6366f1;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-left: 8px;
+        }
+
+        /* Mobile Hero Spotlight Section */
+        .hero-section {
+            padding: 20px 0 16px 0;
+        }
+
+        .hero-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .main-hero-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 340px;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .main-hero-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(5, 8, 17, 0.2) 0%, rgba(5, 8, 17, 0.75) 50%, rgba(5, 8, 17, 0.98) 100%);
+            z-index: 1;
+        }
+
+        .hero-card-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+        }
+
+        .hero-card-title {
+            font-size: clamp(1.35rem, 5.5vw, 2.2rem);
+            font-weight: 800;
+            line-height: 1.28;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .hero-card-title a { color: #fff; }
+        .hero-card-title a:hover { color: #38bdf8; }
+
+        .hero-card-excerpt {
+            color: #cbd5e1;
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        .hero-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-pill-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Mobile Hero Sidebar Stories */
+        .hero-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-header {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .side-story-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .side-story-card:active, .side-story-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .side-story-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: #1e293b;
+            flex-shrink: 0;
+        }
+
+        .side-story-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .side-story-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.3;
+            color: var(--text-primary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .side-story-title a { color: var(--text-primary); }
+
+        .side-story-meta {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Mobile Touch-Momentum Category Tabs Bar */
+        .category-nav-bar {
+            position: sticky;
+            top: 64px;
+            z-index: 90;
+            background: rgba(5, 8, 17, 0.95);
+            backdrop-filter: blur(14px);
+            border-y: 1px solid var(--border-color);
+            padding: 10px 0;
+            margin: 20px 0 16px 0;
+        }
+
+        .category-tabs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2px;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .cat-tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 38px;
+            flex-shrink: 0;
+        }
+
+        .cat-tab-btn:active, .cat-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #fff;
+        }
+
+        .cat-tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #4f46e5 100%);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Mobile Category Section Blocks */
+        .category-section {
+            margin-bottom: 40px;
+            scroll-margin-top: 130px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .category-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 70px;
+            height: 2px;
+            background: var(--cat-accent, var(--accent-primary));
+            border-radius: 2px;
+        }
+
+        .category-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--cat-accent, var(--accent-primary));
+            flex-shrink: 0;
+        }
+
+        .category-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .category-count-badge {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Magazine Stack (1 Lead Card + 4 Sub-Cards) */
+        .magazine-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .cat-lead-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .cat-lead-img-wrapper {
+            position: relative;
+            height: 190px;
+            width: 100%;
+            overflow: hidden;
+            background: #1e293b;
+        }
+
+        .cat-lead-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cat-lead-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(5, 8, 17, 0.88);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--cat-accent, var(--accent-primary));
+            color: var(--cat-accent, #fff);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .cat-lead-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .cat-lead-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.32;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .cat-lead-title a { color: var(--text-primary); }
+
+        .cat-lead-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .cat-lead-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Mobile Compact Horizontal Touch Sub-Card Layout */
+        .cat-sub-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            transition: all 0.2s ease;
+            min-height: 100px;
+        }
+
+        .cat-sub-card:active, .cat-sub-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .cat-sub-img-wrapper {
+            height: 100px;
+            width: 110px;
+            overflow: hidden;
+            background: #1e293b;
+            flex-shrink: 0;
+        }
+
+        .cat-sub-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cat-sub-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cat-sub-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .cat-sub-title a { color: var(--text-primary); }
+
+        .cat-sub-excerpt {
+            display: none; /* Hidden on narrow mobile for ultra-compact scannability */
+        }
+
+        .cat-sub-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Mobile Live TV Stream Grid */
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .channel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: var(--touch-target);
+        }
+
+        .channel-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #fff;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Newsletter Card */
+        .newsletter-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: var(--radius-md);
+            padding: 28px 18px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter-card h3 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .newsletter-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .newsletter-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .newsletter-card input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(5, 8, 17, 0.9);
+            color: #fff;
+            font-size: 0.9rem;
+            min-height: var(--touch-target);
+        }
+
+        /* Mobile Touch-Friendly Footer */
+        footer {
+            background: #03050a;
+            border-top: 1px solid var(--border-color);
+            padding: 40px 0 24px 0;
+            margin-top: 48px;
+            color: var(--text-secondary);
+        }
+
+        .footer-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        .footer-col h4 {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+
+        .footer-brand-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 14px;
+        }
+
+        .footer-cat-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+            font-weight: 600;
+            min-height: var(--touch-target);
+            text-decoration: none !important;
+        }
+
+        .footer-cat-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* ════════════════════════════════════════════════════════════
+           PROGRESSIVE ENHANCEMENTS FOR TABLETS & DESKTOPS
+           ════════════════════════════════════════════════════════════ */
+
+        /* Tablet Enhancement (min-width: 640px) */
+        @media (min-width: 640px) {
+            .brand-badge-tech { display: inline-flex; }
+            .channels-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+            .newsletter-card form { flex-direction: row; justify-content: center; }
+            .newsletter-card input { width: 320px; }
+            .cat-sub-card { min-height: 110px; }
+            .cat-sub-img-wrapper { width: 140px; height: 110px; }
+            .cat-sub-excerpt {
+                display: -webkit-box;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                line-height: 1.4;
+                margin-bottom: 8px;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        }
+
+        /* Tablet / Desktop Enhancement (min-width: 768px) */
+        @media (min-width: 768px) {
+            .container { padding: 0 24px; }
+            header { height: 76px; }
+            .brand-logo { font-size: 1.35rem; gap: 12px; }
+            .brand-icon-box { width: 40px; height: 40px; border-radius: 12px; }
+            .brand-text { font-size: 1.35rem; }
+            
+            nav.main-nav a { font-size: 0.92rem; padding: 6px 0; }
+            .btn-btn { padding: 10px 18px; font-size: 0.88rem; }
+            
+            .ticker-bar { height: 46px; }
+            .ticker-label { padding: 0 20px; font-size: 0.74rem; }
+            .ticker-viewport { padding-left: 165px; }
+            .ticker-item { font-size: 0.85rem; padding: 0 24px; }
+            
+            .hero-section { padding: 32px 0 20px 0; }
+            .hero-grid { display: grid; grid-template-columns: 2.1fr 1fr; gap: 24px; }
+            .main-hero-card { min-height: 460px; padding: 36px; border-radius: var(--radius-lg); }
+            .cat-lead-img-wrapper { height: 240px; }
+            
+            .category-nav-bar { top: 76px; padding: 14px 0; margin: 28px 0 20px 0; }
+            .cat-tab-btn { padding: 8px 18px; font-size: 0.85rem; }
+            .category-section { margin-bottom: 52px; scroll-margin-top: 150px; }
+            .category-title { font-size: 1.45rem; }
+            
+            .magazine-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+            
+            .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: row; justify-content: space-between; text-align: left; }
+        }
+
+        /* Large Desktop Magazine Grid Enhancement (min-width: 1024px) */
+        @media (min-width: 1024px) {
+            .magazine-grid {
+                display: grid;
+                grid-template-columns: 1.4fr 1fr 1fr;
+                grid-template-rows: auto auto;
+                gap: 22px;
+            }
+
+            .cat-lead-card { grid-row: span 2; }
+            
+            .cat-sub-card {
+                flex-direction: column;
+                align-items: stretch;
+                min-height: auto;
+            }
+
+            .cat-sub-img-wrapper {
+                width: 100%;
+                height: 140px;
+            }
+
+            .cat-sub-body { padding: 16px; }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: 2fr 1.4fr 1.2fr 1.2fr;
+                gap: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-inner">
+            <a href="/" class="brand-logo">
+                <div class="brand-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                        <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
+                        <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
+                        <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
+                    </svg>
+                </div>
+                <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
+                <span class="brand-badge-tech"><span class="pulse-dot"></span>MAGAZINE</span>
+            </a>
+            
+            <nav class="main-nav">
+                <a href="/" class="active">Home</a>
+                <a href="#cat-ai">AI & ML</a>
+                <a href="#cat-startups">Startups</a>
+                <a href="#cat-cyber">Cybersecurity</a>
+                <a href="#cat-gadgets">Gadgets</a>
+                <a href="#cat-business">Business</a>
+                <a href="#cat-india">India News</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="/dashboard" class="btn-btn btn-outline">🔥 Trends</a>
+                <div id="userAuthContainer" style="display:inline-flex; gap:8px;">
+                    <button id="authBtn" onclick="openAuthModal()" class="btn-btn btn-primary">🔐 Login</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile-First Live Intelligence Broadcast Ticker Bar -->
+    <div class="ticker-bar">
+        <div class="ticker-label">
+            <span class="pulse-dot"></span> LIVE SIGNAL
+        </div>
+        <div class="ticker-viewport">
+            <div class="ticker-track" id="ticker-track">
+                <div class="ticker-item"><span class="ticker-item-title">Initializing real-time news intelligence pipeline...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-grid">
+                <!-- Main Spotlight Hero Card -->
+                <div class="main-hero-card" id="hero-main">
+                    <div class="hero-card-content">
+                        <span class="cat-pill" id="hero-cat">🤖 AI Intelligence</span>
+                        <h1 class="hero-card-title" id="hero-title">Loading Top Magazine Story...</h1>
+                        <p class="hero-card-excerpt" id="hero-excerpt">Initializing global news pipeline and synthesizing top published articles across technology, business, and AI.</p>
+                        <div class="hero-card-meta" id="hero-meta">
+                            <span class="meta-pill-sm">DigitalBrief Editorial Desk</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Stories Sidebar -->
+                <div class="hero-sidebar">
+                    <div class="sidebar-header">
+                        <span>⚡ TOP TRENDING STORIES</span>
+                        <span style="font-size:0.75rem; color:var(--accent-cyan); font-weight:700;">REAL-TIME</span>
+                    </div>
+                    <div id="hero-sidebar-container" style="display:flex; flex-direction:column; gap:12px;">
+                        <div class="side-story-card"><div class="side-story-title">Loading top stories...</div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category Sticky Filter Bar -->
+        <div class="category-nav-bar">
+            <div class="category-tabs" id="category-tabs">
+                <button class="cat-tab-btn active" onclick="scrollToCategory('all')">🌐 All Categories</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-ai')">🤖 AI & Machine Learning</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-startups')">🚀 Startups & VC</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-cyber')">🛡️ Cybersecurity</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-gadgets')">📱 Gadgets & Hardware</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-business')">💼 Business & Finance</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-india')">🇮🇳 India News & Markets</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-auto')">🚗 Auto & Mobility</button>
+                <button class="cat-tab-btn" onclick="scrollToCategory('cat-tech')">💻 Tech & Innovation</button>
+            </div>
+        </div>
+
+        <!-- CATEGORY SECTIONS CONTAINER -->
+        <div id="category-sections-container">
+            <div style="text-align: center; padding: 60px 0; color: var(--text-muted);">
+                <h3>Loading Category-Wise Magazine Articles...</h3>
+            </div>
+        </div>
+
+        <!-- Live News TV Channels Section -->
+        <section id="live-news" style="margin-top: 30px; margin-bottom: 40px;">
+            <div class="category-header" style="--cat-accent: #f43f5e;">
+                <div class="category-title-group">
+                    <div class="category-icon" style="color:#f43f5e;">📺</div>
+                    <h2 class="category-title">Live 24/7 Global News Channels</h2>
+                </div>
+                <span class="category-count-badge">10 LIVE STREAMS</span>
+            </div>
+            <div class="channels-grid" id="channels-grid">
+                <div class="channel-card"><div class="channel-icon">BBC</div><div><strong>BBC News</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">Live Stream</span></div></div>
+                <div class="channel-card"><div class="channel-icon">NDTV</div><div><strong>NDTV 24x7</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">Live Stream</span></div></div>
+                <div class="channel-card"><div class="channel-icon">DW</div><div><strong>DW News</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">Live Stream</span></div></div>
+                <div class="channel-card"><div class="channel-icon">F24</div><div><strong>France 24</strong><br><span style="font-size:0.75rem; color:var(--text-muted)">Live Stream</span></div></div>
+            </div>
+        </section>
+
+        <!-- Newsletter Subscription Card -->
+        <section style="margin-top: 30px;">
+            <div class="newsletter-card">
+                <h3>Stay Ahead with DigitalBrief Magazine</h3>
+                <p>Get curated AI breakthroughs, venture funding, cybersecurity alerts, and market intelligence delivered directly to your inbox every morning.</p>
+                <form onsubmit="event.preventDefault(); alert('Subscribed to DigitalBrief Daily!');">
+                    <input type="email" placeholder="Enter your business email" required>
+                    <button type="submit" class="btn-btn btn-primary">Subscribe Now</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mobile-First Tech Magazine Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Brand & Site Description Card Column -->
+                <div class="footer-col">
+                    <div>
+                        <a href="/" class="brand-logo">
+                            <div class="brand-icon-box">
+                                <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                                    <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
+                                    <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
+                                    <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+                                    <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
+                                    <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
+                                </svg>
+                            </div>
+                            <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
+                        </a>
+                    </div>
+                    <div class="footer-brand-card">
+                        <span class="brand-badge-tech" style="display:inline-flex; margin-bottom:8px;">
+                            <span class="pulse-dot"></span> MULTI-SOURCE INTELLIGENCE
+                        </span>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55;">
+                            Multi-source technology trend intelligence, real-time news aggregation, and automated editorial publication system. Built for global tech leaders, researchers, and strategists.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editorial Categories Column -->
+                <div class="footer-col">
+                    <h4>Editorial Categories</h4>
+                    <ul>
+                        <li>
+                            <a href="#cat-ai" class="footer-cat-link" style="--cat-accent: #818cf8;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+                                </div>
+                                <span>AI & Machine Learning</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#cat-startups" class="footer-cat-link" style="--cat-accent: #10b981;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+                                </div>
+                                <span>Startups & VC</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#cat-cyber" class="footer-cat-link" style="--cat-accent: #06b6d4;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                                </div>
+                                <span>Cybersecurity & Privacy</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#cat-gadgets" class="footer-cat-link" style="--cat-accent: #f59e0b;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                </div>
+                                <span>Gadgets & Hardware</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#cat-business" class="footer-cat-link" style="--cat-accent: #38bdf8;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                </div>
+                                <span>Business & Markets</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#cat-india" class="footer-cat-link" style="--cat-accent: #f97316;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                </div>
+                                <span>India News & Economy</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Platform & API Column -->
+                <div class="footer-col">
+                    <h4>Platform & API</h4>
+                    <ul>
+                        <li>
+                            <a href="/dashboard" class="footer-cat-link" style="--cat-accent: #6366f1;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                </div>
+                                <span>Live Trends Pipeline</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="/docs" class="footer-cat-link" style="--cat-accent: #06b6d4;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                </div>
+                                <span>Swagger API Docs</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/api/articles" class="footer-cat-link" style="--cat-accent: #10b981;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                                </div>
+                                <span>Articles JSON API</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Legal & Editorial Column -->
+                <div class="footer-col">
+                    <h4>Legal & Editorial</h4>
+                    <ul>
+                        <li>
+                            <a href="/privacy" class="footer-cat-link" style="--cat-accent: #38bdf8;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </div>
+                                <span>Privacy Policy</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/terms" class="footer-cat-link" style="--cat-accent: #f59e0b;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                </div>
+                                <span>Terms of Service</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/editorial-standards" class="footer-cat-link" style="--cat-accent: #10b981;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                                </div>
+                                <span>Editorial Standards</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/contact" class="footer-cat-link" style="--cat-accent: #f43f5e;">
+                                <div class="footer-cat-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                </div>
+                                <span>Contact Editors</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>&copy; 2026 DigitalBrief & Jeet Digital Marketing Agency. All rights reserved.</span>
+                <span>Powered by FastAPI & AI Trend Engine v2.0</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Dynamic Fetch & Magazine Render Script (100% Unchanged Functionality) -->
+    <script>
+        const CATEGORIES_CONFIG = [
+            {
+                id: 'cat-ai',
+                key: 'AI',
+                title: 'AI & Machine Learning',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>',
+                accent: '#818cf8',
+                aliases: ['ai', 'artificial intelligence', 'machine learning', 'llm', 'deepmind', 'openai']
+            },
+            {
+                id: 'cat-startups',
+                key: 'Startups & Funding',
+                title: 'Startups & Venture Capital',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>',
+                accent: '#10b981',
+                aliases: ['startups & funding', 'startup', 'vc', 'funding', 'venture capital', 'unicorn']
+            },
+            {
+                id: 'cat-cyber',
+                key: 'Cybersecurity',
+                title: 'Cybersecurity & Privacy',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>',
+                accent: '#06b6d4',
+                aliases: ['cybersecurity', 'security', 'hack', 'ransomware', 'zero-day', 'cisa']
+            },
+            {
+                id: 'cat-gadgets',
+                key: 'Gadgets & Hardware',
+                title: 'Gadgets & Consumer Tech',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+                accent: '#f59e0b',
+                aliases: ['gadgets & hardware', 'gadgets', 'hardware', 'apple', 'samsung', 'playstation', 'phone', 'laptop']
+            },
+            {
+                id: 'cat-business',
+                key: 'Business & Finance',
+                title: 'Business & Global Economy',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+                accent: '#38bdf8',
+                aliases: ['business & finance', 'business', 'finance', 'economy', 'markets', 'stock', 'semiconductor']
+            },
+            {
+                id: 'cat-india',
+                key: 'India News',
+                title: 'India News & Markets',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+                accent: '#f97316',
+                aliases: ['india news', 'india', 'isro', 'sensex', 'upi', 'bjp', 'delhi', 'mumbai']
+            },
+            {
+                id: 'cat-auto',
+                key: 'Auto & Mobility',
+                title: 'Auto & Smart Mobility',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>',
+                accent: '#ef4444',
+                aliases: ['auto & mobility', 'auto', 'ev', 'mobility', 'car', 'vehicle', 'tesla']
+            },
+            {
+                id: 'cat-tech',
+                key: 'Technology',
+                title: 'Tech Innovation & Software',
+                icon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+                accent: '#a855f7',
+                aliases: ['technology', 'tech', 'software', 'cloud', 'dev', 'quantum']
+            }
+        ];
+
+        const CATEGORY_FALLBACK_IMAGES = {
+            'AI': [
+                'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Startups & Funding': [
+                'https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Cybersecurity': [
+                'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Gadgets & Hardware': [
+                'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Business & Finance': [
+                'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'India News': [
+                'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Auto & Mobility': [
+                'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80'
+            ],
+            'Technology': [
+                'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
+                'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80'
+            ]
+        };
+
+        function resolveImage(item, key, index) {
+            if (item && item.featured_image && item.featured_image.startsWith('http')) return item.featured_image;
+            if (item && item.image_url && item.image_url.startsWith('http')) return item.image_url;
+            const list = CATEGORY_FALLBACK_IMAGES[key] || CATEGORY_FALLBACK_IMAGES['Technology'];
+            return list[index % list.length];
+        }
+
+        function matchCategoryKey(rawCat) {
+            if (!rawCat) return 'Technology';
+            const catLower = rawCat.toString().toLowerCase().trim();
+            for (const cfg of CATEGORIES_CONFIG) {
+                for (const alias of cfg.aliases) {
+                    if (catLower.includes(alias)) return cfg.key;
+                }
+            }
+            return 'Technology';
+        }
+
+        function scrollToCategory(id) {
+            if (id === 'all') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+            document.querySelectorAll('.cat-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        async function loadHomepage() {
+            try {
+                // 1. Fetch Published Articles (up to 100)
+                const resArt = await fetch('/api/articles?status=published&limit=100');
+                const artJson = await resArt.json();
+                const publishedArticles = artJson.data || [];
+
+                // 2. Fetch Real-time Trends for fallback & Ticker
+                const resTrends = await fetch('/api/trends/enriched?sort=score');
+                const trendsJson = await resTrends.json();
+                const trends = trendsJson.data || [];
+
+                // 3. Render TV Broadcast Marquee Ticker
+                const tickerTrackEl = document.getElementById('ticker-track');
+                const rawItems = (trends.length > 0) ? trends.slice(0, 12) : publishedArticles.slice(0, 10);
+                
+                if (rawItems.length > 0 && tickerTrackEl) {
+                    const itemsHTML = rawItems.map(t => {
+                        const title = t.title || 'Breaking Technology News';
+                        const score = t.trend_score || t.score || 85;
+                        const link = (t.slug && t.slug !== 'dashboard') ? `/article/${t.slug}` : '/dashboard';
+                        return `
+                            <a href="${link}" class="ticker-item">
+                                <span class="ticker-item-title">${title}</span>
+                                <span class="ticker-score-badge">SCORE ${score}</span>
+                                <span class="ticker-divider">⚡</span>
+                            </a>
+                        `;
+                    }).join('');
+                    
+                    tickerTrackEl.innerHTML = itemsHTML + itemsHTML;
+                }
+
+                // 4. Render Spotlight Hero Section
+                if (publishedArticles.length > 0) {
+                    const lead = publishedArticles[0];
+                    const leadImg = resolveImage(lead, matchCategoryKey(lead.category), 0);
+                    const heroMain = document.getElementById('hero-main');
+                    
+                    heroMain.style.backgroundImage = `linear-gradient(180deg, rgba(5, 8, 17, 0.3) 0%, rgba(5, 8, 17, 0.95) 100%), url('${leadImg}')`;
+                    document.getElementById('hero-cat').innerText = lead.category || 'Technology';
+                    document.getElementById('hero-title').innerHTML = `<a href="/article/${lead.slug}">${lead.title}</a>`;
+                    document.getElementById('hero-excerpt').innerText = lead.excerpt || lead.meta_description || '';
+                    
+                    document.getElementById('hero-meta').innerHTML = `
+                        <span class="meta-pill-sm">👤 ${lead.author || 'DigitalBrief Desk'}</span>
+                        <span class="meta-pill-sm">⏱️ ${lead.read_time_minutes || 4} MIN</span>
+                        <span class="meta-pill-sm">📅 ${new Date(lead.published_at || Date.now()).toLocaleDateString('en-US', {month:'short', day:'numeric'})}</span>
+                        <a href="/article/${lead.slug}" class="btn-btn btn-primary" style="padding:4px 12px; font-size:0.78rem; margin-left:auto;">Read Full Story &rarr;</a>
+                    `;
+
+                    // Hero Sidebar: Top 4 items
+                    const sidebarArts = publishedArticles.slice(1, 5);
+                    const sidebarContainer = document.getElementById('hero-sidebar-container');
+                    sidebarContainer.innerHTML = sidebarArts.map((art, i) => {
+                        const img = resolveImage(art, matchCategoryKey(art.category), i);
+                        return `
+                            <div class="side-story-card">
+                                <img src="${img}" alt="${art.title}" class="side-story-img">
+                                <div class="side-story-body">
+                                    <span class="cat-pill" style="font-size:0.62rem; padding:2px 7px; margin-bottom:4px; background:#1e293b;">${art.category || 'Editorial'}</span>
+                                    <div class="side-story-title"><a href="/article/${art.slug}">${art.title}</a></div>
+                                    <div class="side-story-meta">
+                                        <span>⏱️ ${art.read_time_minutes || 3} min</span>
+                                        <span>• ${art.source || 'DigitalBrief'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                // 5. Group Published Articles by Category & Blending Fallback (Guarantees 5+ per Category)
+                const articlesByCategory = {};
+                CATEGORIES_CONFIG.forEach(cfg => {
+                    articlesByCategory[cfg.key] = [];
+                });
+
+                publishedArticles.forEach(art => {
+                    const key = matchCategoryKey(art.category);
+                    if (articlesByCategory[key]) {
+                        articlesByCategory[key].push(art);
+                    } else {
+                        articlesByCategory['Technology'].push(art);
+                    }
+                });
+
+                // Blend in trends if any category has fewer than 5 items
+                CATEGORIES_CONFIG.forEach(cfg => {
+                    const currentCount = articlesByCategory[cfg.key].length;
+                    if (currentCount < 5) {
+                        const matchingTrends = trends.filter(t => matchCategoryKey(t.category) === cfg.key);
+                        let needed = 5 - currentCount;
+                        matchingTrends.forEach(tr => {
+                            if (needed > 0 && !articlesByCategory[cfg.key].some(item => item.title === tr.title)) {
+                                articlesByCategory[cfg.key].push({
+                                    id: 'trend_' + (tr.rank || Math.random()),
+                                    title: tr.title,
+                                    slug: 'dashboard',
+                                    excerpt: tr.description || 'Spiking trend intelligence story from real-time global news feeds.',
+                                    category: cfg.key,
+                                    featured_image: tr.image_url || '',
+                                    author: 'Trend Engine',
+                                    source: tr.publisher || tr.source || 'Global Feed',
+                                    read_time_minutes: 3,
+                                    is_trend: true
+                                });
+                                needed--;
+                            }
+                        });
+                        
+                        if (articlesByCategory[cfg.key].length < 5) {
+                            trends.forEach(tr => {
+                                if (articlesByCategory[cfg.key].length < 5 && !articlesByCategory[cfg.key].some(item => item.title === tr.title)) {
+                                    articlesByCategory[cfg.key].push({
+                                        id: 'trend_gen_' + Math.random(),
+                                        title: tr.title,
+                                        slug: 'dashboard',
+                                        excerpt: tr.description || 'Top market intelligence briefing from DigitalBrief network.',
+                                        category: cfg.key,
+                                        featured_image: tr.image_url || '',
+                                        author: 'DigitalBrief AI',
+                                        source: tr.publisher || 'Wire',
+                                        read_time_minutes: 3,
+                                        is_trend: true
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+
+                // 6. RENDER CATEGORY-WISE MAGAZINE SECTIONS
+                const sectionsContainer = document.getElementById('category-sections-container');
+                sectionsContainer.innerHTML = '';
+
+                CATEGORIES_CONFIG.forEach(cfg => {
+                    const catArticles = articlesByCategory[cfg.key] || [];
+                    if (catArticles.length === 0) return;
+
+                    const displayItems = catArticles.slice(0, 5);
+                    const leadItem = displayItems[0];
+                    const subItems = displayItems.slice(1, 5);
+
+                    const leadImg = resolveImage(leadItem, cfg.key, 0);
+                    const leadLink = leadItem.is_trend ? '/dashboard' : `/article/${leadItem.slug}`;
+
+                    let sectionHTML = `
+                        <section class="category-section" id="${cfg.id}">
+                            <div class="category-header" style="--cat-accent: ${cfg.accent};">
+                                <div class="category-title-group">
+                                    <div class="category-icon" style="color:${cfg.accent};">${cfg.icon}</div>
+                                    <h2 class="category-title">${cfg.title}</h2>
+                                </div>
+                                <span class="category-count-badge">${catArticles.length} ARTICLES</span>
+                            </div>
+
+                            <div class="magazine-grid" style="--cat-accent: ${cfg.accent};">
+                                <!-- 1 LEAD FEATURE CARD -->
+                                <article class="cat-lead-card">
+                                    <div class="cat-lead-img-wrapper">
+                                        <img src="${leadImg}" alt="${leadItem.title}" class="cat-lead-img">
+                                        <span class="cat-lead-badge">${cfg.key.toUpperCase()}</span>
+                                    </div>
+                                    <div class="cat-lead-body">
+                                        <h3 class="cat-lead-title"><a href="${leadLink}">${leadItem.title}</a></h3>
+                                        <p class="cat-lead-excerpt">${leadItem.excerpt || leadItem.meta_description || ''}</p>
+                                        <div class="cat-lead-footer">
+                                            <span>👤 ${leadItem.author || 'Editorial Desk'}</span>
+                                            <span>⏱️ ${leadItem.read_time_minutes || 4} min read</span>
+                                            <a href="${leadLink}" class="btn-btn btn-outline" style="padding:4px 12px; font-size:0.75rem;">Read Article &rarr;</a>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <!-- 4 SECONDARY GRID CARDS -->
+                                ${subItems.map((sub, idx) => {
+                                    const subImg = resolveImage(sub, cfg.key, idx + 1);
+                                    const subLink = sub.is_trend ? '/dashboard' : `/article/${sub.slug}`;
+                                    return `
+                                        <article class="cat-sub-card">
+                                            <div class="cat-sub-img-wrapper">
+                                                <img src="${subImg}" alt="${sub.title}" class="cat-sub-img">
+                                            </div>
+                                            <div class="cat-sub-body">
+                                                <h4 class="cat-sub-title"><a href="${subLink}">${sub.title}</a></h4>
+                                                <p class="cat-sub-excerpt">${sub.excerpt || ''}</p>
+                                                <div class="cat-sub-footer">
+                                                    <span>⏱️ ${sub.read_time_minutes || 3} min read</span>
+                                                    <span>${sub.source || 'DigitalBrief'}</span>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </section>
+                    `;
+
+                    sectionsContainer.innerHTML += sectionHTML;
+                });
+
+            } catch (err) {
+                console.error("Homepage magazine render error:", err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHomepage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Editors — DigitalBrief Intelligence Desk</title>
+    <meta name="description" content="Get in touch with the DigitalBrief editorial desk, submit press releases, report news corrections, or request API licensing info.">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #050811;
+            --bg-card: #0f172a;
+            --bg-nav: rgba(5, 8, 17, 0.88);
+            --border-color: #1e293b;
+            --accent-primary: #f43f5e;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --font-main: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-body); color: var(--text-primary); font-family: var(--font-main); line-height: 1.7; }
+        a { color: #fb7185; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--bg-nav); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color); height: 76px;
+            display: flex; align-items: center;
+        }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        .brand-logo { display: inline-flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.35rem; color: #fff; text-decoration: none !important; }
+        .brand-icon-box { width: 38px; height: 38px; background: #0f172a; border: 1px solid #f43f5e; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+        .page-banner {
+            padding: 48px 0 32px 0; border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, rgba(244,63,94,0.08) 0%, rgba(5,8,17,0) 100%);
+        }
+        .page-title { font-size: 2.4rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; }
+        .page-subtitle { color: var(--text-secondary); font-size: 1.1rem; max-width: 700px; }
+
+        .contact-grid {
+            display: grid; grid-template-columns: 1fr 1.3fr; gap: 40px; margin: 40px 0 80px 0;
+        }
+        .info-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 32px; height: fit-content;
+        }
+        .info-card h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 16px; color: #fff; }
+        .info-item { margin-bottom: 20px; display: flex; gap: 14px; align-items: flex-start; }
+        .info-icon {
+            width: 36px; height: 36px; border-radius: 10px; background: rgba(244,63,94,0.12);
+            border: 1px solid rgba(244,63,94,0.3); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: #fb7185;
+        }
+
+        .form-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 36px;
+        }
+        .form-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: #fff; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 8px; color: var(--text-secondary); }
+        .form-control {
+            width: 100%; padding: 12px 16px; border-radius: 10px;
+            border: 1px solid var(--border-color); background: rgba(5,8,17,0.8);
+            color: #fff; font-family: inherit; font-size: 0.95rem;
+        }
+        .form-control:focus { outline: none; border-color: #f43f5e; box-shadow: 0 0 12px rgba(244,63,94,0.3); }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: #fff; border: none; padding: 14px 28px; border-radius: 10px;
+            font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s;
+            width: 100%;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(244,63,94,0.4); }
+
+        footer { background: #03050a; border-top: 1px solid var(--border-color); padding: 40px 0; color: var(--text-muted); font-size: 0.88rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-inner">
+            <a href="/" class="brand-logo">
+                <div class="brand-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 100 100" fill="none"><rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#F43F5E" stroke-width="4"/><circle cx="50" cy="50" r="10" fill="#FB7185"/></svg>
+                </div>
+                <span class="brand-text">DIGITAL<span style="color:#fb7185;">BRIEF</span></span>
+            </a>
+            <div style="display:flex; gap:16px;">
+                <a href="/" style="color:#cbd5e1; font-weight:600;">Home</a>
+                <a href="/dashboard" style="color:#cbd5e1; font-weight:600;">Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Banner -->
+    <div class="page-banner">
+        <div class="container">
+            <h1 class="page-title">✉️ Contact Editorial Desk</h1>
+            <p class="page-subtitle">Have a news tip, correction, press release, or API integration request? Send a message directly to our editorial team.</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container contact-grid">
+        <!-- Contact Info Box -->
+        <aside class="info-card">
+            <h3>DigitalBrief Desk</h3>
+            
+            <div class="info-item">
+                <div class="info-icon">📧</div>
+                <div>
+                    <strong>Editorial Email</strong>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">editor@digitalbrief.in</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">⚡</div>
+                <div>
+                    <strong>Press & Submissions</strong>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">press@digitalbrief.in</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">📍</div>
+                <div>
+                    <strong>Publishing Agency</strong>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">DigitalBrief & Jeet Digital Marketing Agency</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">⏱️</div>
+                <div>
+                    <strong>Response Time</strong>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">Within 24 business hours</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Form Box -->
+        <section class="form-card">
+            <h2>Send Message</h2>
+            <form onsubmit="event.preventDefault(); alert('Thank you! Your message has been sent to the DigitalBrief Editorial Desk.'); this.reset();">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" class="form-control" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" placeholder="name@company.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Enquiry Category</label>
+                    <select class="form-control" required style="background:#0a0e1a;">
+                        <option value="tip">News Tip or Press Release</option>
+                        <option value="correction">Factual Correction Request</option>
+                        <option value="api">API Access & Enterprise Licensing</option>
+                        <option value="feedback">General Editorial Feedback</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Message Content</label>
+                    <textarea class="form-control" rows="5" placeholder="Provide full details of your enquiry..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Enquiry to Editors &rarr;</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            &copy; 2026 DigitalBrief & Jeet Digital Marketing Agency. All rights reserved. • <a href="/editorial-standards" style="color:var(--text-muted);">Editorial Standards</a>
+        </div>
+    </footer>
+</body>
+</html>

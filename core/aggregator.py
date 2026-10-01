@@ -68,9 +68,11 @@ class TrendAggregator:
         # Deduplicate: exact normalized-URL pass first, then fuzzy title match
         # (only for comparable title lengths to avoid false merges).
         merged, seen = [], []
+        seen_word_sets = []
         url_index = {}
         for trend in all_trends:
             t = trend["title"].lower()
+            t_words = set(w for w in t.split() if len(w) > 3)
             dup = False
             best = -1
             key = _url_key(trend["url"])
@@ -81,6 +83,9 @@ class TrendAggregator:
                 for i, s in enumerate(seen):
                     if abs(len(t) - len(s)) / max(len(t), len(s), 1) > 0.45:
                         continue  # title lengths too different to be the same story
+                    s_words = seen_word_sets[i]
+                    if t_words and s_words and not (t_words & s_words):
+                        continue  # no common words, skip expensive SequenceMatcher
                     if SequenceMatcher(None, t, s).ratio() > 0.78:
                         dup = True
                         best = i
@@ -94,6 +99,7 @@ class TrendAggregator:
                 url_index[key] = best
             else:
                 seen.append(t)
+                seen_word_sets.append(t_words)
                 trend["sources"] = [trend["source"]]
                 merged.append(trend)
                 url_index[key] = len(merged) - 1

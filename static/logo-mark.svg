@@ -1,23 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DigitalBrief logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" role="img" aria-label="DigitalBrief Tech Logo">
   <defs>
-    <linearGradient id="db-tile" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6366f1"/>
-      <stop offset="55%" stop-color="#8b5cf6"/>
-      <stop offset="100%" stop-color="#a855f7"/>
+    <linearGradient id="dbGradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="50%" stop-color="#4FACFE" />
+      <stop offset="100%" stop-color="#6366F1" />
     </linearGradient>
-    <linearGradient id="db-rim" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#22d3ee"/>
-      <stop offset="100%" stop-color="#a78bfa"/>
+    <linearGradient id="dbGradSecondary" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7" />
+      <stop offset="100%" stop-color="#06B6D4" />
     </linearGradient>
+    <linearGradient id="dbBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <filter id="dbGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="#0f0f12"/>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#db-tile)" opacity="0.24"/>
-  <rect x="2.5" y="2.5" width="59" height="59" rx="15.5" fill="none" stroke="url(#db-rim)" stroke-width="2"/>
-  <path d="M44.1 15.8 A9.5 9.5 0 0 1 56.2 27.9" fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M46.9 17.2 A6.2 6.2 0 0 1 54.2 24.5" fill="none" stroke="#a78bfa" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
-  <polyline points="12,46 22,46 28,32 34,38 42,22 48,26" fill="none" stroke="#eef2ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="48" cy="26" r="4.2" fill="#22d3ee"/>
-  <circle cx="48" cy="26" r="7.4" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.55"/>
-  <circle cx="12" cy="46" r="2.4" fill="#a78bfa" opacity="0.9"/>
-  <circle cx="22" cy="46" r="2.4" fill="#818cf8" opacity="0.8"/>
+
+  <!-- Outer Rounded Tech Container -->
+  <rect x="4" y="4" width="92" height="92" rx="24" fill="url(#dbBgGrad)" stroke="url(#dbGradPrimary)" stroke-width="2.5"/>
+  <rect x="7" y="7" width="86" height="86" rx="21" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Cyber Hexagon Shield Layer -->
+  <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="url(#dbGradSecondary)" stroke-width="2.5" opacity="0.85" stroke-dasharray="8 4"/>
+
+  <!-- Core Monogram 'D' and 'B' Signal Waves -->
+  <!-- Left Pillar 'D' -->
+  <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="url(#dbGradPrimary)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#dbGlow)"/>
+  
+  <!-- Right Pulse Wave 'B' / Tech Signal -->
+  <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="url(#dbGradSecondary)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Glowing Data Nodes -->
+  <circle cx="50" cy="16" r="3.5" fill="#00F2FE" />
+  <circle cx="80" cy="32" r="3" fill="#A855F7" />
+  <circle cx="50" cy="84" r="3.5" fill="#6366F1" />
+  <circle cx="20" cy="68" r="3" fill="#06B6D4" />
+  <circle cx="50" cy="50" r="4" fill="#00F2FE" filter="url(#dbGlow)"/>
 </svg>

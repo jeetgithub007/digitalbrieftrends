@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ article.seo_title }}</title>
+    <meta name="description" content="{{ article.meta_description }}">
+    <meta name="keywords" content="{{ article.focus_keyword }}, {{ article.secondary_keywords|join(', ') }}">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ article.social_title or article.seo_title }}">
+    <meta property="og:description" content="{{ article.social_description or article.meta_description }}">
+    <meta property="og:image" content="{{ article.featured_image }}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- JSON-LD Schema Markup (SEO / AEO / GEO) -->
+    <!-- NEWS_SCHEMA_PLACEHOLDER -->
+    <!-- FAQ_SCHEMA_PLACEHOLDER -->
+
+    <!-- Favicon & Fonts -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #07090e;
+            --bg-card: #0e131f;
+            --bg-card-hover: #141c2e;
+            --bg-nav: rgba(7, 9, 14, 0.85);
+            --border-color: #1e293b;
+            --accent-primary: #6366f1;
+            --accent-secondary: #06b6d4;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: var(--accent-secondary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Full Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-nav);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.35rem;
+            letter-spacing: -0.03em;
+            color: #f8fafc;
+            text-decoration: none !important;
+        }
+
+        .brand-icon-box {
+            width: 38px;
+            height: 38px;
+            background: radial-gradient(circle at 30% 30%, #1e293b, #090d16);
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px rgba(99, 102, 241, 0.25), inset 0 0 8px rgba(6, 182, 212, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .brand-logo:hover .brand-icon-box {
+            border-color: #06b6d4;
+            box-shadow: 0 0 22px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(99, 102, 241, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .brand-text {
+            font-weight: 800;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #ffffff 30%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-text-highlight {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-badge-tech {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #818cf8;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .brand-badge-tech .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: techPulse 2s infinite;
+        }
+
+        @keyframes techPulse {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.3); }
+            100% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        .article-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: rgba(14, 19, 31, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 28px;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+        }
+
+        .meta-pill:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #f8fafc;
+        }
+
+        .meta-pill svg { flex-shrink: 0; }
+        .meta-pill.meta-author svg { color: #818cf8; }
+        .meta-pill.meta-date svg { color: #38bdf8; }
+        .meta-pill.meta-read svg { color: #34d399; }
+        .meta-pill.meta-verified svg { color: #10b981; }
+
+        .meta-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .meta-val {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        nav.main-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        nav.main-nav a {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        nav.main-nav a:hover {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .btn-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none !important;
+        }
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        /* Article Main Layout */
+        main.article-container {
+            max-width: 840px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .cat-badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .article-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .featured-img {
+            width: 100%;
+            max-height: 460px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Article Body Content Styling */
+        .article-body {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+        .article-body p { margin-bottom: 24px; }
+        .article-body h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 36px 0 16px 0;
+            letter-spacing: -0.01em;
+        }
+        .article-body h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 24px 0 12px 0;
+        }
+        .article-body ul, .article-body ol {
+            margin: 0 0 24px 24px;
+        }
+        .article-body li { margin-bottom: 8px; }
+
+        .key-takeaways-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 32px 0;
+        }
+        .key-takeaways-box h3 { margin-top: 0; margin-bottom: 12px; color: var(--accent-primary); }
+
+        .trend-stat-banner {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 50px;
+            padding-top: 36px;
+            border-top: 1px solid var(--border-color);
+        }
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .faq-question {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .faq-answer {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Source Footer Attribution */
+        .source-attribution {
+            background: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Full Footer */
+        footer {
+            background: #04060a;
+            border-top: 1px solid var(--border-color);
+            padding: 60px 0 30px 0;
+            margin-top: 80px;
+            color: var(--text-secondary);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 20px;
+        }
+        .footer-col h4 {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 10px; font-size: 0.9rem; }
+        .footer-col a { color: var(--text-secondary); text-decoration: none; }
+        .footer-col a:hover { color: var(--text-primary); }
+
+        .footer-bottom {
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 1280px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            nav.main-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Full Header -->
+    <header>
+        <div class="header-inner">
+            <a href="/" class="brand-logo">
+                <div class="brand-icon-box">
+                    <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                        <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
+                        <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
+                        <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+                        <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
+                    </svg>
+                </div>
+                <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
+                <span class="brand-badge-tech"><span class="pulse-dot"></span>HUB</span>
+            </a>
+            
+            <nav class="main-nav">
+                <a href="/">Home</a>
+                <a href="/dashboard">Trending Dashboard</a>
+                <a href="/#articles">Published Editorial</a>
+                <a href="/#live-news">Live News Channels</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="/dashboard" class="btn-btn btn-outline">⚡ Live Pipeline</a>
+                <a href="/admin" class="btn-btn btn-primary">⚙️ Admin CMS</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Article Body -->
+    <main class="article-container">
+        <span class="cat-badge">{{ article.category }}</span>
+        <h1 class="article-title">{{ article.title }}</h1>
+        
+        <div class="article-meta-bar">
+            <div class="meta-pill meta-author">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="meta-label">BY</span>
+                <span class="meta-val">{{ article.author }}</span>
+            </div>
+            
+            <div class="meta-pill meta-date">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span class="meta-val">{{ article.published_at[:10] if article.published_at else 'Recent' }}</span>
+            </div>
+
+            <div class="meta-pill meta-read">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span class="meta-val">{{ article.read_time_minutes }} MIN READ</span>
+            </div>
+
+            <div class="meta-pill meta-verified">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+                <span class="meta-val" style="color: #10b981;">VERIFIED EDITORIAL</span>
+            </div>
+        </div>
+
+        <!-- FEATURED_IMAGE_PLACEHOLDER -->
+
+        <!-- Article HTML Body -->
+        <article class="article-body">
+            {{ article.content | safe }}
+        </article>
+
+        <!-- FAQ Section (AEO) -->
+        <!-- FAQ_SECTION_PLACEHOLDER -->
+
+        <!-- Source Attribution -->
+        <!-- SOURCE_ATTRIBUTION_PLACEHOLDER -->
+    </main>
+
+    <!-- Full Footer -->
+    <footer>
+        <div class="container" style="max-width: 1280px;">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div style="margin-bottom: 16px;">
+                        <a href="/" class="brand-logo">
+                            <div class="brand-icon-box">
+                                <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+                                    <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
+                                    <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
+                                    <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+                                    <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
+                                    <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
+                                </svg>
+                            </div>
+                            <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
+                        </a>
+                    </div>
+                    <p style="font-size: 0.9rem; max-width: 340px;">
+                        Multi-source technology trend intelligence, real-time news aggregation, and automated editorial publication system.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="/#articles">AI & Machine Learning</a></li>
+                        <li><a href="/#articles">Startups & Funding</a></li>
+                        <li><a href="/#articles">Cybersecurity</a></li>
+                        <li><a href="/#articles">Gadgets & Hardware</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="/dashboard">Trends Pipeline</a></li>
+                        <li><a href="/admin">Admin CMS</a></li>
+                        <li><a href="/docs">API Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal & Contact</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Editorial Guidelines</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <span>&copy; 2026 DigitalBrief & Jeet Digital Marketing Agency. All rights reserved.</span>
+                <span>Powered by FastAPI & AI Trend Engine</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

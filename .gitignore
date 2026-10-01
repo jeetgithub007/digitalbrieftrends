@@ -20,5 +20,10 @@ Thumbs.db
 # Vercel
 .vercel/
 
-# Output
+# Output & Cache Data
 *.log
+scratch/
+extracted_sources.json
+failed_sources.json
+validated_sources.json
+

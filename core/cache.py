@@ -1,6 +1,9 @@
 """Thread-safe in-memory cache for trend data."""
 import time
 import threading
+import logging
+
+logger = logging.getLogger("trends.cache")
 
 
 class TrendCache:
@@ -19,6 +22,7 @@ class TrendCache:
             self._data = data
             self._updated_at = time.time()
             self._count += 1
+            logger.info(f"Cache updated with {len(data)} trends (refresh #{self._count})")
 
     def set_source_counts(self, counts):
         with self._lock:
