@@ -637,20 +637,34 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait brief moment for Supabase auth to initialize
             setTimeout(() => {
                 if (!window.isAdminUser || !window.isAdminUser()) {
                     document.body.innerHTML = `
-                        <div style="min-height:100vh; background:#07090e; display:flex; align-items:center; justify-content:center; font-family:sans-serif; padding:20px;">
-                            <div style="background:#0e131f; border:1px solid #ef4444; border-radius:16px; padding:40px; max-width:480px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.8);">
-                                <div style="font-size:3rem; margin-bottom:16px;">🚫</div>
-                                <h1 style="color:#ef4444; font-size:1.6rem; font-weight:800; margin-bottom:12px;">403 - Admin Access Restricted</h1>
-                                <p style="color:#cbd5e1; font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
-                                    The Admin Content Management System is strictly reserved for the site administrator (<strong>j.parganiha@gmail.com</strong>).
+                        <div style="min-height:100vh; background:#050811; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans', system-ui, sans-serif; padding:20px;">
+                            <div style="background:#0e131f; border:1px solid #a855f7; border-radius:20px; padding:36px; max-width:440px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.9); position:relative;">
+                                <div style="width:56px; height:56px; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 16px auto; color:#c084fc;">👑</div>
+                                <h1 style="color:#fff; font-size:1.5rem; font-weight:800; text-align:center; margin-bottom:6px;">Super Admin CMS Portal</h1>
+                                <p style="color:#cbd5e1; font-size:0.88rem; text-align:center; line-height:1.5; margin-bottom:24px;">
+                                    Restricted Content Management Access for Site Administrator (<code>j.parganiha@gmail.com</code>).
                                 </p>
-                                <div style="display:flex; gap:12px; justify-content:center;">
-                                    <button onclick="openAuthModal()" style="background:#6366f1; color:#fff; border:none; padding:10px 18px; border-radius:8px; font-weight:700; cursor:pointer;">🔐 Login as Admin</button>
-                                    <a href="/" style="background:#1e293b; color:#cbd5e1; text-decoration:none; padding:10px 18px; border-radius:8px; font-weight:600;">Return Home</a>
+
+                                <div id="adminInlineAlert" style="display:none; padding:10px 14px; border-radius:10px; font-size:0.85rem; margin-bottom:16px;"></div>
+
+                                <form onsubmit="handleInlineAdminLogin(event)">
+                                    <div style="margin-bottom:14px;">
+                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Admin Email</label>
+                                        <input type="email" id="inlineAdminEmail" value="j.parganiha@gmail.com" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
+                                    </div>
+                                    <div style="margin-bottom:20px;">
+                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Password</label>
+                                        <input type="password" id="inlineAdminPassword" placeholder="••••••••" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
+                                    </div>
+                                    <button type="submit" style="width:100%; background:linear-gradient(135deg,#a855f7,#9333ea); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(168,85,247,0.4);">
+                                        🔐 Sign In & Launch Admin CMS
+                                    </button>
+                                </form>
+                                <div style="margin-top:20px; text-align:center;">
+                                    <a href="/" style="color:#64748b; text-decoration:none; font-size:0.82rem; font-weight:600;">&larr; Return to DigitalBrief Home</a>
                                 </div>
                             </div>
                         </div>
@@ -660,6 +674,33 @@
                 loadArticles();
             }, 400);
         });
+
+        async function handleInlineAdminLogin(e) {
+            e.preventDefault();
+            const alertBox = document.getElementById('adminInlineAlert');
+            const email = document.getElementById('inlineAdminEmail').value.trim();
+            const password = document.getElementById('inlineAdminPassword').value;
+
+            alertBox.style.display = 'block';
+            alertBox.style.background = 'rgba(168,85,247,0.2)';
+            alertBox.style.color = '#c084fc';
+            alertBox.innerText = 'Authenticating Super Admin...';
+
+            if (window.supabase) {
+                const client = window.supabase.createClient("https://wlfxoemctfxnoahyardf.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k");
+                const { data, error } = await client.auth.signInWithPassword({ email, password });
+                if (error) {
+                    alertBox.style.background = 'rgba(239,68,68,0.2)';
+                    alertBox.style.color = '#f87171';
+                    alertBox.innerText = error.message || 'Invalid Super Admin credentials.';
+                    return;
+                }
+                alertBox.style.background = 'rgba(16,185,129,0.2)';
+                alertBox.style.color = '#34d399';
+                alertBox.innerText = '👑 Super Admin Authenticated! Loading CMS...';
+                setTimeout(() => window.location.reload(), 600);
+            }
+        }
     </script>
 </body>
 </html>

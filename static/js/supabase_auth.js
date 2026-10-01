@@ -99,20 +99,23 @@ function updateAuthUI() {
         const isSubscriber = (currentUserProfile && currentUserProfile.subscription_status === 'active') || isAdmin;
         
         const badgeColor = isAdmin ? '#a855f7' : (isSubscriber ? '#10b981' : '#94a3b8');
-        const badgeText = isAdmin ? '👑 Admin' : (isSubscriber ? '⚡ Pro Subscriber' : '👤 Free Tier');
+        const badgeText = isAdmin ? '👑 Super Admin' : (isSubscriber ? '⚡ Pro Subscriber' : '👤 Free User');
 
         authContainer.innerHTML = `
             <div style="display:inline-flex; align-items:center; gap:8px;">
                 <span style="font-size:0.75rem; background:rgba(255,255,255,0.06); border:1px solid ${badgeColor}; color:${badgeColor}; padding:4px 9px; border-radius:6px; font-weight:700;">
                     ${badgeText}
                 </span>
-                ${isAdmin ? '<a href="/admin" class="btn-btn btn-primary" style="padding:6px 12px; font-size:0.78rem;">⚙️ Admin</a>' : ''}
+                ${isAdmin ? '<a href="/admin" class="btn-btn btn-primary" style="padding:6px 12px; font-size:0.78rem;">⚙️ Admin CMS</a>' : ''}
                 <button type="button" onclick="handleSignOut()" class="btn-btn btn-outline" style="padding:6px 12px; font-size:0.78rem;">Logout</button>
             </div>
         `;
     } else {
         authContainer.innerHTML = `
-            <button type="button" onclick="openAuthModal()" class="btn-btn btn-primary" style="padding:6px 14px; font-size:0.8rem; cursor:pointer;">🔐 Login / Register</button>
+            <div style="display:inline-flex; gap:6px;">
+                <button type="button" onclick="openAuthModal('login')" class="btn-btn btn-primary" style="padding:6px 12px; font-size:0.8rem; cursor:pointer;">🔑 User Login</button>
+                <button type="button" onclick="openAuthModal('admin')" class="btn-btn btn-outline" style="padding:6px 12px; font-size:0.8rem; cursor:pointer; border-color:#a855f7; color:#a855f7;">👑 Admin Login</button>
+            </div>
         `;
     }
 }
@@ -169,7 +172,7 @@ function showSubscriberUpgradeModal(featureName) {
                 ${userEmailText}
             </div>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button type="button" onclick="closeSubscriberModal(); openAuthModal();" style="background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer;">
+                <button type="button" onclick="closeSubscriberModal(); openAuthModal('login');" style="background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer;">
                     ${currentUser ? '⚡ Upgrade to Pro Subscription' : '🔑 Log In / Register Account'}
                 </button>
                 <button type="button" onclick="closeSubscriberModal()" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid #1e293b; padding:10px; border-radius:10px; font-weight:600; font-size:0.85rem; cursor:pointer;">
@@ -186,8 +189,10 @@ function closeSubscriberModal() {
     if (modal) modal.style.display = 'none';
 }
 
-// User Auth Modal (Sign In / Register)
-function openAuthModal() {
+let authMode = 'login';
+
+// Dedicated User & Super Admin Login Modal
+function openAuthModal(defaultTab = 'login') {
     let modal = document.getElementById('digitalBriefAuthModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -197,39 +202,51 @@ function openAuthModal() {
     }
 
     modal.innerHTML = `
-        <div style="background:#0e131f; border:1px solid #1e293b; border-radius:18px; max-width:420px; width:100%; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.8); position:relative; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+        <div style="background:#0e131f; border:1px solid #1e293b; border-radius:20px; max-width:440px; width:100%; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.9); position:relative; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
             <button type="button" onclick="closeAuthModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; padding:4px 8px;">✕</button>
             
-            <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #1e293b; padding-bottom:10px;">
-                <button type="button" id="tabLoginBtn" onclick="switchAuthTab('login')" style="background:none; border:none; color:#fff; font-weight:800; font-size:1.05rem; cursor:pointer; border-bottom:2px solid #6366f1; padding-bottom:4px;">Sign In</button>
-                <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" style="background:none; border:none; color:#64748b; font-weight:700; font-size:1.05rem; cursor:pointer; padding-bottom:4px;">Create Account</button>
+            <div style="display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid #1e293b; padding-bottom:12px;">
+                <button type="button" id="tabUserBtn" onclick="switchAuthTab('login')" style="flex:1; background:none; border:none; color:#fff; font-weight:700; font-size:0.88rem; cursor:pointer; border-bottom:2px solid #6366f1; padding-bottom:8px; transition:all 0.2s;">
+                    👤 User Login
+                </button>
+                <button type="button" id="tabAdminBtn" onclick="switchAuthTab('admin')" style="flex:1; background:none; border:none; color:#64748b; font-weight:700; font-size:0.88rem; cursor:pointer; padding-bottom:8px; transition:all 0.2s;">
+                    👑 Super Admin
+                </button>
+                <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" style="flex:1; background:none; border:none; color:#64748b; font-weight:700; font-size:0.88rem; cursor:pointer; padding-bottom:8px; transition:all 0.2s;">
+                    ✨ Register
+                </button>
             </div>
 
-            <div id="authAlert" style="display:none; padding:10px; border-radius:8px; font-size:0.84rem; margin-bottom:14px;"></div>
+            <div id="authAlert" style="display:none; padding:12px 14px; border-radius:10px; font-size:0.85rem; margin-bottom:16px; line-height:1.4;"></div>
 
             <form id="authForm" onsubmit="handleAuthSubmit(event)">
                 <div id="nameGroup" style="display:none; margin-bottom:14px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Full Name</label>
-                    <input type="text" id="authName" placeholder="Enter your name" style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem;">
+                    <input type="text" id="authName" placeholder="Enter your full name" style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
                 </div>
 
                 <div style="margin-bottom:14px;">
-                    <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Email Address</label>
-                    <input type="email" id="authEmail" placeholder="name@domain.com" required style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem;">
+                    <label id="authEmailLabel" style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Email Address</label>
+                    <input type="email" id="authEmail" placeholder="name@domain.com" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
                 </div>
 
                 <div style="margin-bottom:20px;">
                     <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Password</label>
-                    <input type="password" id="authPassword" placeholder="••••••••" required style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem;">
+                    <input type="password" id="authPassword" placeholder="••••••••" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
                 </div>
 
-                <button type="submit" id="authSubmitBtn" style="width:100%; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer;">
+                <button type="submit" id="authSubmitBtn" style="width:100%; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(99,102,241,0.4);">
                     Sign In to DigitalBrief
                 </button>
             </form>
+
+            <div id="authNotice" style="margin-top:16px; font-size:0.78rem; color:#64748b; text-align:center;">
+                Access news, trending keywords & subscriber tools
+            </div>
         </div>
     `;
     modal.style.display = 'flex';
+    switchAuthTab(defaultTab);
 }
 
 function closeAuthModal() {
@@ -237,24 +254,36 @@ function closeAuthModal() {
     if (modal) modal.style.display = 'none';
 }
 
-let authMode = 'login';
 function switchAuthTab(mode) {
     authMode = mode;
-    const loginBtn = document.getElementById('tabLoginBtn');
+    const userBtn = document.getElementById('tabUserBtn');
+    const adminBtn = document.getElementById('tabAdminBtn');
     const regBtn = document.getElementById('tabRegisterBtn');
     const nameGroup = document.getElementById('nameGroup');
+    const emailInput = document.getElementById('authEmail');
     const submitBtn = document.getElementById('authSubmitBtn');
+    const noticeEl = document.getElementById('authNotice');
+
+    [userBtn, adminBtn, regBtn].forEach(b => {
+        if (b) { b.style.color = '#64748b'; b.style.borderBottom = 'none'; }
+    });
 
     if (mode === 'login') {
-        if (loginBtn) { loginBtn.style.color = '#fff'; loginBtn.style.borderBottom = '2px solid #6366f1'; }
-        if (regBtn) { regBtn.style.color = '#64748b'; regBtn.style.borderBottom = 'none'; }
+        if (userBtn) { userBtn.style.color = '#fff'; userBtn.style.borderBottom = '2px solid #6366f1'; }
         if (nameGroup) nameGroup.style.display = 'none';
-        if (submitBtn) submitBtn.innerText = 'Sign In to DigitalBrief';
+        if (submitBtn) { submitBtn.innerText = '⚡ Sign In to User Dashboard'; submitBtn.style.background = 'linear-gradient(135deg,#6366f1,#4f46e5)'; }
+        if (noticeEl) noticeEl.innerHTML = 'Sign in to access your subscriber dashboard & features';
+    } else if (mode === 'admin') {
+        if (adminBtn) { adminBtn.style.color = '#a855f7'; adminBtn.style.borderBottom = '2px solid #a855f7'; }
+        if (nameGroup) nameGroup.style.display = 'none';
+        if (emailInput && !emailInput.value) emailInput.value = 'j.parganiha@gmail.com';
+        if (submitBtn) { submitBtn.innerText = '👑 Authenticate & Launch Admin CMS'; submitBtn.style.background = 'linear-gradient(135deg,#a855f7,#9333ea)'; }
+        if (noticeEl) noticeEl.innerHTML = '<strong>Super Admin Access:</strong> Restricted to <code>j.parganiha@gmail.com</code>';
     } else {
-        if (regBtn) { regBtn.style.color = '#fff'; regBtn.style.borderBottom = '2px solid #6366f1'; }
-        if (loginBtn) { loginBtn.style.color = '#64748b'; loginBtn.style.borderBottom = 'none'; }
+        if (regBtn) { regBtn.style.color = '#10b981'; regBtn.style.borderBottom = '2px solid #10b981'; }
         if (nameGroup) nameGroup.style.display = 'block';
-        if (submitBtn) submitBtn.innerText = 'Create Account';
+        if (submitBtn) { submitBtn.innerText = '🚀 Create Account'; submitBtn.style.background = 'linear-gradient(135deg,#10b981,#059669)'; }
+        if (noticeEl) noticeEl.innerHTML = 'Join DigitalBrief to unlock subscriber intelligence & alerts';
     }
 }
 
@@ -280,12 +309,23 @@ async function handleAuthSubmit(e) {
     alertBox.innerText = 'Authenticating with Supabase...';
 
     try {
-        if (authMode === 'login') {
+        if (authMode === 'login' || authMode === 'admin') {
             const { data, error } = await client.auth.signInWithPassword({ email, password });
             if (error) throw error;
-            alertBox.style.background = 'rgba(16,185,129,0.2)'; alertBox.style.color = '#34d399';
-            alertBox.innerText = 'Success! Logging in...';
-            setTimeout(() => { closeAuthModal(); window.location.reload(); }, 600);
+            
+            const isAdmin = email.toLowerCase() === 'j.parganiha@gmail.com';
+            alertBox.style.background = 'rgba(16,185,129,0.2)';
+            alertBox.style.color = '#34d399';
+            alertBox.innerText = isAdmin ? '👑 Super Admin Authenticated! Launching CMS...' : 'Success! Logging in...';
+            
+            setTimeout(() => {
+                closeAuthModal();
+                if (isAdmin || authMode === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.reload();
+                }
+            }, 600);
         } else {
             const { data, error } = await client.auth.signUp({
                 email,
@@ -293,7 +333,8 @@ async function handleAuthSubmit(e) {
                 options: { data: { full_name: name } }
             });
             if (error) throw error;
-            alertBox.style.background = 'rgba(16,185,129,0.2)'; alertBox.style.color = '#34d399';
+            alertBox.style.background = 'rgba(16,185,129,0.2)';
+            alertBox.style.color = '#34d399';
             alertBox.innerText = 'Account created successfully! Logging in...';
             setTimeout(() => { closeAuthModal(); window.location.reload(); }, 800);
         }
@@ -304,7 +345,7 @@ async function handleAuthSubmit(e) {
     }
 }
 
-// Bind all functions explicitly to global window object
+// Bind functions globally
 window.openAuthModal = openAuthModal;
 window.closeAuthModal = closeAuthModal;
 window.switchAuthTab = switchAuthTab;
