@@ -1530,7 +1530,8 @@ function filterByCategory(cat) {
 
 // ── Trend actions ──
 function _findTrend(rank) {
-  return allTrends.find(t => t.rank === rank);
+  if (rank === undefined || rank === null) return null;
+  return allTrends.find(t => String(t.rank) === String(rank));
 }
 
 function showModal(title, bodyHtml) {

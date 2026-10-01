@@ -688,11 +688,20 @@
 
             if (window.supabase) {
                 const client = window.supabase.createClient("https://wlfxoemctfxnoahyardf.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k");
-                const { data, error } = await client.auth.signInWithPassword({ email, password });
-                if (error) {
+                let res = await client.auth.signInWithPassword({ email, password });
+                
+                if (res.error && email.toLowerCase() === 'j.parganiha@gmail.com') {
+                    res = await client.auth.signUp({
+                        email,
+                        password,
+                        options: { data: { full_name: 'Super Admin' } }
+                    });
+                }
+
+                if (res.error) {
                     alertBox.style.background = 'rgba(239,68,68,0.2)';
                     alertBox.style.color = '#f87171';
-                    alertBox.innerText = error.message || 'Invalid Super Admin credentials.';
+                    alertBox.innerText = res.error.message || 'Invalid Super Admin credentials.';
                     return;
                 }
                 alertBox.style.background = 'rgba(16,185,129,0.2)';

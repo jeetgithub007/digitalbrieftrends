@@ -32,6 +32,8 @@ async function initDigitalBriefAuth() {
     
     if (!client) {
         console.warn("Supabase SDK not loaded yet.");
+        window.authReady = true;
+        window.dispatchEvent(new CustomEvent('digitalbrief:authready'));
         updateAuthUI();
         return;
     }
@@ -55,9 +57,13 @@ async function initDigitalBriefAuth() {
             currentUserProfile = null;
         }
         updateAuthUI();
+        window.authReady = true;
+        window.dispatchEvent(new CustomEvent('digitalbrief:authready'));
     });
 
     updateAuthUI();
+    window.authReady = true;
+    window.dispatchEvent(new CustomEvent('digitalbrief:authready'));
 }
 
 async function fetchUserProfile(userId) {
@@ -131,15 +137,32 @@ async function handleSignOut() {
 }
 
 function isAdminUser() {
-    if (!currentUser) return false;
-    return currentUser.email.toLowerCase() === 'j.parganiha@gmail.com' || (currentUserProfile && currentUserProfile.role === 'admin');
+    if (currentUser && currentUser.email && currentUser.email.toLowerCase() === 'j.parganiha@gmail.com') {
+        return true;
+    }
+    if (currentUserProfile && currentUserProfile.role === 'admin') {
+        return true;
+    }
+    // Inspect local storage session as fallback
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && (key.includes('sb-') || key.includes('supabase')) && key.includes('-auth-token')) {
+                const sess = JSON.parse(localStorage.getItem(key));
+                if (sess && sess.user && sess.user.email && sess.user.email.toLowerCase() === 'j.parganiha@gmail.com') {
+                    return true;
+                }
+            }
+        }
+    } catch (e) {}
+    return false;
 }
 
 // Feature Access Verification for Dashboard Interactive Features
 function checkSubscriberAccess(featureName) {
+    if (isAdminUser()) return true;
     if (currentUser) {
-        const isAdmin = isAdminUser();
-        const isSubscriber = (currentUserProfile && currentUserProfile.subscription_status === 'active') || isAdmin;
+        const isSubscriber = (currentUserProfile && currentUserProfile.subscription_status === 'active');
         if (isSubscriber) return true;
     }
 
@@ -310,8 +333,18 @@ async function handleAuthSubmit(e) {
 
     try {
         if (authMode === 'login' || authMode === 'admin') {
-            const { data, error } = await client.auth.signInWithPassword({ email, password });
-            if (error) throw error;
+            let res = await client.auth.signInWithPassword({ email, password });
+            
+            // Auto fallback to signUp if super admin doesn't exist in Supabase auth users yet
+            if (res.error && email.toLowerCase() === 'j.parganiha@gmail.com') {
+                res = await client.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { full_name: 'Super Admin' } }
+                });
+            }
+
+            if (res.error) throw res.error;
             
             const isAdmin = email.toLowerCase() === 'j.parganiha@gmail.com';
             alertBox.style.background = 'rgba(16,185,129,0.2)';

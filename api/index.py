@@ -533,6 +533,7 @@ async def generate_and_publish_article(request: Request):
         return {"status": "existing", "article": existing, "message": "Article already generated for this story!"}
 
     article_data = generate_full_article(trend)
+    article_data["original_news_id"] = news_id
     created = article_store.create(article_data)
     return {"status": "ok", "article": created, "message": "Article synthesized and published successfully!"}
 
