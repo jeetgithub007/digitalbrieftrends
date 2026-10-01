@@ -1086,8 +1086,9 @@
 
             <div class="nav-actions">
                 <a href="/dashboard" class="btn-btn btn-outline">🔥 Trends</a>
-                <div id="userAuthContainer" style="display:inline-flex; gap:8px;">
-                    <button id="authBtn" onclick="openAuthModal()" class="btn-btn btn-primary">🔐 Login</button>
+                <div id="userAuthContainer" style="display:inline-flex; gap:6px;">
+                    <button type="button" onclick="openAuthModal('login')" class="btn-btn btn-primary" style="padding:6px 12px; font-size:0.8rem; cursor:pointer;">🔑 User Login</button>
+                    <button type="button" onclick="openAuthModal('admin')" class="btn-btn btn-outline" style="padding:6px 12px; font-size:0.8rem; cursor:pointer; border-color:#a855f7; color:#a855f7;">👑 Admin Login</button>
                 </div>
             </div>
         </div>

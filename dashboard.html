@@ -581,8 +581,9 @@
     position: relative;
     display: inline-block;
   }
+  .export-menu-wrap.open .export-menu,
   .export-menu-wrap:hover .export-menu {
-    display: flex;
+    display: flex !important;
   }
   .export-menu {
     display: none;
@@ -837,9 +838,9 @@
       </div>
       <div class="deck-actions">
         <button class="deck-btn" onclick="toggleAnalytics()" title="Open Real-Time Analytics">📊 Analytics</button>
-        <div class="export-menu-wrap">
-          <button class="deck-btn export-trigger" type="button">📥 Export ▾</button>
-          <div class="export-menu">
+        <div class="export-menu-wrap" id="exportMenuWrap">
+          <button class="deck-btn export-trigger" type="button" onclick="toggleExportMenu(event)">📥 Export ▾</button>
+          <div class="export-menu" id="exportMenu">
             <button type="button" onclick="exportData('csv')">📄 Download CSV</button>
             <button type="button" onclick="exportData('json')">📦 Download JSON</button>
             <button type="button" onclick="window.print()">🖨️ Print Report</button>
@@ -994,7 +995,22 @@ function switchView(viewMode) {
   renderTrends();
 }
 
+function toggleExportMenu(e) {
+  if (e) e.stopPropagation();
+  const wrap = document.getElementById('exportMenuWrap');
+  if (wrap) wrap.classList.toggle('open');
+}
+
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('exportMenuWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    wrap.classList.remove('open');
+  }
+});
+
 function exportData(format) {
+  const wrap = document.getElementById('exportMenuWrap');
+  if (wrap) wrap.classList.remove('open');
   if (!checkSubscriberAccess('Dataset Export (CSV/JSON)')) return;
   const url = `/api/trends/export?format=${format}&category=${encodeURIComponent(currentCategory)}&min_score=${currentMinScore}`;
   window.location.href = url;

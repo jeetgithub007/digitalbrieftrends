@@ -339,8 +339,9 @@ def _find_trend(rank):
     data, _, _ = cache.get()
     if not data:
         return None
+    rank_str = str(rank).strip()
     for t in data:
-        if t.get("rank") == rank:
+        if str(t.get("rank", "")).strip() == rank_str:
             return t
     return None
 
