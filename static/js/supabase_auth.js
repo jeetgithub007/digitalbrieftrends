@@ -8,16 +8,36 @@ let supabaseClient = null;
 let currentUser = null;
 let currentUserProfile = null;
 
-if (window.supabase) {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function getSupabaseClient() {
+    if (!supabaseClient && window.supabase) {
+        try {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) {
+            console.error("Supabase client init error:", e);
+        }
+    }
+    return supabaseClient;
 }
 
 // Global Auth Initialization
 async function initDigitalBriefAuth() {
-    if (!supabaseClient) return;
+    let client = getSupabaseClient();
+    if (!client) {
+        for (let i = 0; i < 5; i++) {
+            await new Promise(r => setTimeout(r, 200));
+            client = getSupabaseClient();
+            if (client) break;
+        }
+    }
+    
+    if (!client) {
+        console.warn("Supabase SDK not loaded yet.");
+        updateAuthUI();
+        return;
+    }
 
     try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await client.auth.getSession();
         if (session && session.user) {
             currentUser = session.user;
             await fetchUserProfile(currentUser.id);
@@ -26,8 +46,7 @@ async function initDigitalBriefAuth() {
         console.error("Auth init error:", e);
     }
 
-    // Subscribe to auth state changes
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    client.auth.onAuthStateChange(async (event, session) => {
         if (session && session.user) {
             currentUser = session.user;
             await fetchUserProfile(currentUser.id);
@@ -42,8 +61,11 @@ async function initDigitalBriefAuth() {
 }
 
 async function fetchUserProfile(userId) {
+    const client = getSupabaseClient();
+    if (!client) return;
+
     try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await client
             .from('profiles')
             .select('*')
             .eq('id', userId)
@@ -85,19 +107,20 @@ function updateAuthUI() {
                     ${badgeText}
                 </span>
                 ${isAdmin ? '<a href="/admin" class="btn-btn btn-primary" style="padding:6px 12px; font-size:0.78rem;">⚙️ Admin</a>' : ''}
-                <button onclick="handleSignOut()" class="btn-btn btn-outline" style="padding:6px 12px; font-size:0.78rem;">Logout</button>
+                <button type="button" onclick="handleSignOut()" class="btn-btn btn-outline" style="padding:6px 12px; font-size:0.78rem;">Logout</button>
             </div>
         `;
     } else {
         authContainer.innerHTML = `
-            <button onclick="openAuthModal()" class="btn-btn btn-primary" style="padding:6px 14px; font-size:0.8rem;">🔐 Login / Register</button>
+            <button type="button" onclick="openAuthModal()" class="btn-btn btn-primary" style="padding:6px 14px; font-size:0.8rem; cursor:pointer;">🔐 Login / Register</button>
         `;
     }
 }
 
 async function handleSignOut() {
-    if (supabaseClient) {
-        await supabaseClient.auth.signOut();
+    const client = getSupabaseClient();
+    if (client) {
+        await client.auth.signOut();
         currentUser = null;
         currentUserProfile = null;
         window.location.reload();
@@ -108,18 +131,15 @@ function isAdminUser() {
     if (!currentUser) return false;
     return currentUser.email.toLowerCase() === 'j.parganiha@gmail.com' || (currentUserProfile && currentUserProfile.role === 'admin');
 }
-window.isAdminUser = isAdminUser;
 
 // Feature Access Verification for Dashboard Interactive Features
 function checkSubscriberAccess(featureName) {
-    // Admin (j.parganiha@gmail.com) or active Pro Subscriber has full access
     if (currentUser) {
         const isAdmin = isAdminUser();
         const isSubscriber = (currentUserProfile && currentUserProfile.subscription_status === 'active') || isAdmin;
         if (isSubscriber) return true;
     }
 
-    // Otherwise block feature access and display upgrade modal
     showSubscriberUpgradeModal(featureName);
     return false;
 }
@@ -130,7 +150,7 @@ function showSubscriberUpgradeModal(featureName) {
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'subscriberUpgradeModal';
-        modal.style.cssText = 'position:fixed; inset:0; z-index:9999; background:rgba(5,8,17,0.85); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:20px;';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:999999; background:rgba(5,8,17,0.85); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:20px;';
         document.body.appendChild(modal);
     }
 
@@ -138,8 +158,8 @@ function showSubscriberUpgradeModal(featureName) {
     const userEmailText = currentUser ? `Logged in as: <strong>${currentUser.email}</strong> (Free Tier)` : 'You are currently browsing as a Guest';
 
     modal.innerHTML = `
-        <div style="background:#0e131f; border:1px solid #6366f1; border-radius:18px; max-width:480px; width:100%; padding:32px; box-shadow:0 20px 50px rgba(0,0,0,0.8); text-align:center; position:relative;">
-            <button onclick="closeSubscriberModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer;">✕</button>
+        <div style="background:#0e131f; border:1px solid #6366f1; border-radius:18px; max-width:480px; width:100%; padding:32px; box-shadow:0 20px 50px rgba(0,0,0,0.8); text-align:center; position:relative; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+            <button type="button" onclick="closeSubscriberModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">✕</button>
             <div style="width:54px; height:54px; background:rgba(99,102,241,0.15); border:1px solid #6366f1; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px auto; color:#818cf8;">🔒</div>
             <h3 style="font-size:1.4rem; font-weight:800; color:#fff; margin-bottom:10px;">Pro Subscriber Feature Restricted</h3>
             <p style="color:#cbd5e1; font-size:0.92rem; line-height:1.55; margin-bottom:20px;">
@@ -149,10 +169,10 @@ function showSubscriberUpgradeModal(featureName) {
                 ${userEmailText}
             </div>
             <div style="display:flex; flex-direction:column; gap:10px;">
-                <button onclick="closeSubscriberModal(); openAuthModal();" style="background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer;">
+                <button type="button" onclick="closeSubscriberModal(); openAuthModal();" style="background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer;">
                     ${currentUser ? '⚡ Upgrade to Pro Subscription' : '🔑 Log In / Register Account'}
                 </button>
-                <button onclick="closeSubscriberModal()" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid #1e293b; padding:10px; border-radius:10px; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                <button type="button" onclick="closeSubscriberModal()" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid #1e293b; padding:10px; border-radius:10px; font-weight:600; font-size:0.85rem; cursor:pointer;">
                     Continue Reading News Preview
                 </button>
             </div>
@@ -172,17 +192,17 @@ function openAuthModal() {
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'digitalBriefAuthModal';
-        modal.style.cssText = 'position:fixed; inset:0; z-index:9999; background:rgba(5,8,17,0.85); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:20px;';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:999999; background:rgba(5,8,17,0.85); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:20px;';
         document.body.appendChild(modal);
     }
 
     modal.innerHTML = `
-        <div style="background:#0e131f; border:1px solid #1e293b; border-radius:18px; max-width:420px; width:100%; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.8); position:relative;">
-            <button onclick="closeAuthModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.2rem; cursor:pointer;">✕</button>
+        <div style="background:#0e131f; border:1px solid #1e293b; border-radius:18px; max-width:420px; width:100%; padding:30px; box-shadow:0 20px 50px rgba(0,0,0,0.8); position:relative; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+            <button type="button" onclick="closeAuthModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; padding:4px 8px;">✕</button>
             
             <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #1e293b; padding-bottom:10px;">
-                <button id="tabLoginBtn" onclick="switchAuthTab('login')" style="background:none; border:none; color:#fff; font-weight:800; font-size:1.05rem; cursor:pointer; border-bottom:2px solid #6366f1; padding-bottom:4px;">Sign In</button>
-                <button id="tabRegisterBtn" onclick="switchAuthTab('register')" style="background:none; border:none; color:#64748b; font-weight:700; font-size:1.05rem; cursor:pointer; padding-bottom:4px;">Create Account</button>
+                <button type="button" id="tabLoginBtn" onclick="switchAuthTab('login')" style="background:none; border:none; color:#fff; font-weight:800; font-size:1.05rem; cursor:pointer; border-bottom:2px solid #6366f1; padding-bottom:4px;">Sign In</button>
+                <button type="button" id="tabRegisterBtn" onclick="switchAuthTab('register')" style="background:none; border:none; color:#64748b; font-weight:700; font-size:1.05rem; cursor:pointer; padding-bottom:4px;">Create Account</button>
             </div>
 
             <div id="authAlert" style="display:none; padding:10px; border-radius:8px; font-size:0.84rem; margin-bottom:14px;"></div>
@@ -226,24 +246,33 @@ function switchAuthTab(mode) {
     const submitBtn = document.getElementById('authSubmitBtn');
 
     if (mode === 'login') {
-        loginBtn.style.color = '#fff'; loginBtn.style.borderBottom = '2px solid #6366f1';
-        regBtn.style.color = '#64748b'; regBtn.style.borderBottom = 'none';
-        nameGroup.style.display = 'none';
-        submitBtn.innerText = 'Sign In to DigitalBrief';
+        if (loginBtn) { loginBtn.style.color = '#fff'; loginBtn.style.borderBottom = '2px solid #6366f1'; }
+        if (regBtn) { regBtn.style.color = '#64748b'; regBtn.style.borderBottom = 'none'; }
+        if (nameGroup) nameGroup.style.display = 'none';
+        if (submitBtn) submitBtn.innerText = 'Sign In to DigitalBrief';
     } else {
-        regBtn.style.color = '#fff'; regBtn.style.borderBottom = '2px solid #6366f1';
-        loginBtn.style.color = '#64748b'; loginBtn.style.borderBottom = 'none';
-        nameGroup.style.display = 'block';
-        submitBtn.innerText = 'Create Account';
+        if (regBtn) { regBtn.style.color = '#fff'; regBtn.style.borderBottom = '2px solid #6366f1'; }
+        if (loginBtn) { loginBtn.style.color = '#64748b'; loginBtn.style.borderBottom = 'none'; }
+        if (nameGroup) nameGroup.style.display = 'block';
+        if (submitBtn) submitBtn.innerText = 'Create Account';
     }
 }
 
 async function handleAuthSubmit(e) {
     e.preventDefault();
+    const client = getSupabaseClient();
     const alertBox = document.getElementById('authAlert');
     const email = document.getElementById('authEmail').value.trim();
     const password = document.getElementById('authPassword').value;
     const name = document.getElementById('authName') ? document.getElementById('authName').value.trim() : '';
+
+    if (!client) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239,68,68,0.2)';
+        alertBox.style.color = '#f87171';
+        alertBox.innerText = 'Supabase client unavailable. Please refresh page.';
+        return;
+    }
 
     alertBox.style.display = 'block';
     alertBox.style.background = 'rgba(99,102,241,0.2)';
@@ -252,13 +281,13 @@ async function handleAuthSubmit(e) {
 
     try {
         if (authMode === 'login') {
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { data, error } = await client.auth.signInWithPassword({ email, password });
             if (error) throw error;
             alertBox.style.background = 'rgba(16,185,129,0.2)'; alertBox.style.color = '#34d399';
             alertBox.innerText = 'Success! Logging in...';
             setTimeout(() => { closeAuthModal(); window.location.reload(); }, 600);
         } else {
-            const { data, error } = await supabaseClient.auth.signUp({
+            const { data, error } = await client.auth.signUp({
                 email,
                 password,
                 options: { data: { full_name: name } }
@@ -275,4 +304,20 @@ async function handleAuthSubmit(e) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', initDigitalBriefAuth);
+// Bind all functions explicitly to global window object
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.switchAuthTab = switchAuthTab;
+window.handleAuthSubmit = handleAuthSubmit;
+window.handleSignOut = handleSignOut;
+window.showSubscriberUpgradeModal = showSubscriberUpgradeModal;
+window.closeSubscriberModal = closeSubscriberModal;
+window.checkSubscriberAccess = checkSubscriberAccess;
+window.isAdminUser = isAdminUser;
+window.initDigitalBriefAuth = initDigitalBriefAuth;
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDigitalBriefAuth);
+} else {
+    initDigitalBriefAuth();
+}
