@@ -2,8 +2,8 @@
 // DIGITALBRIEF SUPABASE AUTHENTICATION & ROLE-BASED ACCESS CONTROL ENGINE
 // High-Tech Magazine UI Edition
 // ============================================================================
-const SUPABASE_URL = "https://wlfxoemctfxnoahyardf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k";
+const SUPABASE_URL = window.SUPABASE_URL || "https://wlfxoemctfxnoahyardf.supabase.co";
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k";
 
 let supabaseClient = null;
 let currentUser = null;
@@ -56,9 +56,13 @@ let currentUserProfile = null;
 function getSupabaseClient() {
     if (!supabaseClient && window.supabase) {
         try {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const url = window.SUPABASE_URL || SUPABASE_URL;
+            const key = window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
+            if (url && key && url.startsWith('http') && !url.includes('YOUR_NEW')) {
+                supabaseClient = window.supabase.createClient(url, key);
+            }
         } catch (e) {
-            console.error("Supabase client init error:", e);
+            console.warn("Supabase client init pending new project credentials:", e);
         }
     }
     return supabaseClient;
