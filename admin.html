@@ -302,172 +302,206 @@
 </head>
 <body>
 
-    <header>
-        <div class="header-inner">
-            <a href="/" class="brand-logo" style="text-decoration:none;">
-                <div class="brand-icon-box">
-                    <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
-                        <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
-                        <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
-                        <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
-                        <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
-                        <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
-                    </svg>
+    <!-- Super Admin CMS Main Layout (Hidden by default until authenticated) -->
+    <div id="adminCMSLayout" style="display:none;">
+        <header>
+            <div class="header-inner">
+                <a href="/" class="brand-logo" style="text-decoration:none;">
+                    <div class="brand-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                            <rect x="4" y="4" width="92" height="92" rx="24" fill="#0F172A" stroke="#6366F1" stroke-width="4"/>
+                            <polygon points="50,16 80,32 80,68 50,84 20,68 20,32" fill="none" stroke="#06B6D4" stroke-width="4" stroke-dasharray="8 4"/>
+                            <path d="M34 32 C34 32 34 68 34 68 C34 68 52 68 52 50 C52 32 34 32 34 32 Z" fill="none" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+                            <path d="M50 32 C62 32 68 40 60 48 C68 54 64 68 48 68" fill="none" stroke="#A855F7" stroke-width="5" stroke-linecap="round"/>
+                            <circle cx="50" cy="50" r="5" fill="#00F2FE"/>
+                        </svg>
+                    </div>
+                    <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
+                    <span class="brand-badge-tech"><span class="pulse-dot"></span>CMS</span>
+                </a>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div id="userAuthContainer"></div>
+                    <a href="/" class="btn btn-secondary">🌐 Public Homepage</a>
+                    <a href="/dashboard" class="btn btn-primary">⚡ Pipeline Dashboard</a>
                 </div>
-                <span class="brand-text">DIGITAL<span class="brand-text-highlight">BRIEF</span></span>
-                <span class="brand-badge-tech"><span class="pulse-dot"></span>CMS</span>
-            </a>
-            <div>
-                <a href="/" class="btn btn-secondary" style="margin-right:10px;">🌐 Public Homepage</a>
-                <a href="/dashboard" class="btn btn-primary">⚡ Pipeline Dashboard</a>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Stats Bar -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Articles</div>
+                    <div class="stat-val" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Published</div>
+                    <div class="stat-val" id="stat-published" style="color:var(--accent-green)">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Drafts</div>
+                    <div class="stat-val" id="stat-drafts" style="color:var(--accent-amber)">0</div>
+                </div>
+            </div>
+
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+                <div class="filter-group">
+                    <input type="text" id="search-input" placeholder="Search articles..." style="width:260px;" oninput="loadArticles()">
+                    <select id="status-filter" onchange="loadArticles()">
+                        <option value="">All Statuses</option>
+                        <option value="published">Published</option>
+                        <option value="draft">Drafts</option>
+                    </select>
+                    <select id="category-filter" onchange="loadArticles()">
+                        <option value="">All Categories</option>
+                        <option value="AI">AI</option>
+                        <option value="Startups & Funding">Startups</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="Technology">Technology</option>
+                        <option value="India News">India News</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-green" onclick="openCreateModal()">➕ Create Manual Article</button>
+            </div>
+
+            <!-- Articles Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Status</th>
+                            <th>Author</th>
+                            <th>Published Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="articles-tbody">
+                        <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-muted);">Loading articles...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Modal Editor -->
+        <div class="modal-overlay" id="article-modal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3 id="modal-title" style="font-size:1.2rem; font-weight:800;">Edit Article</h3>
+                    <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-id">
+                    
+                    <div class="form-group">
+                        <label>Article Title</label>
+                        <input type="text" id="edit-title" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>URL Slug</label>
+                            <input type="text" id="edit-slug" placeholder="auto-generated-if-blank">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="edit-category">
+                                <option value="AI">AI</option>
+                                <option value="Startups & Funding">Startups & Funding</option>
+                                <option value="Crypto & Web3">Crypto & Web3</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="Gadgets & Hardware">Gadgets & Hardware</option>
+                                <option value="Software & Dev">Software & Dev</option>
+                                <option value="Business & Finance">Business & Finance</option>
+                                <option value="Technology">Technology</option>
+                                <option value="India News">India News</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="edit-status">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input type="text" id="edit-author" value="DigitalBrief Editorial Desk">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Excerpt / Summary</label>
+                        <textarea id="edit-excerpt" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Article HTML Content</label>
+                        <textarea id="edit-content" rows="10" style="font-family:monospace; font-size:0.85rem;"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>SEO Meta Title</label>
+                            <input type="text" id="edit-seo-title">
+                        </div>
+                        <div class="form-group">
+                            <label>Focus Keyword</label>
+                            <input type="text" id="edit-focus-kw">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Meta Description</label>
+                        <textarea id="edit-meta-desc" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Featured Image URL</label>
+                        <input type="text" id="edit-image">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveArticle()">💾 Save Changes</button>
+                </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="container">
-        <!-- Stats Bar -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Articles</div>
-                <div class="stat-val" id="stat-total">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Published</div>
-                <div class="stat-val" id="stat-published" style="color:var(--accent-green)">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Drafts</div>
-                <div class="stat-val" id="stat-drafts" style="color:var(--accent-amber)">0</div>
-            </div>
-        </div>
+    <!-- Super Admin Inline Login Container -->
+    <div id="adminLoginLayout" style="display:none; min-height:100vh; background:#050811; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans', system-ui, sans-serif; padding:20px;">
+        <div style="background:#0e131f; border:1px solid #a855f7; border-radius:20px; padding:36px; max-width:440px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.9); position:relative;">
+            <div style="width:56px; height:56px; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 16px auto; color:#c084fc;">👑</div>
+            <h1 style="color:#fff; font-size:1.5rem; font-weight:800; text-align:center; margin-bottom:6px;">Super Admin CMS Portal</h1>
+            <p style="color:#cbd5e1; font-size:0.88rem; text-align:center; line-height:1.5; margin-bottom:24px;">
+                Restricted Content Management Access for Site Administrator (<code>j.parganiha@gmail.com</code>).
+            </p>
 
-        <!-- Controls Bar -->
-        <div class="controls-bar">
-            <div class="filter-group">
-                <input type="text" id="search-input" placeholder="Search articles..." style="width:260px;" oninput="loadArticles()">
-                <select id="status-filter" onchange="loadArticles()">
-                    <option value="">All Statuses</option>
-                    <option value="published">Published</option>
-                    <option value="draft">Drafts</option>
-                </select>
-                <select id="category-filter" onchange="loadArticles()">
-                    <option value="">All Categories</option>
-                    <option value="AI">AI</option>
-                    <option value="Startups & Funding">Startups</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Technology">Technology</option>
-                    <option value="India News">India News</option>
-                </select>
-            </div>
+            <div id="adminInlineAlert" style="display:none; padding:10px 14px; border-radius:10px; font-size:0.85rem; margin-bottom:16px;"></div>
 
-            <button class="btn btn-green" onclick="openCreateModal()">➕ Create Manual Article</button>
-        </div>
-
-        <!-- Articles Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                        <th>Author</th>
-                        <th>Published Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="articles-tbody">
-                    <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-muted);">Loading articles...</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
-
-    <!-- Modal Editor -->
-    <div class="modal-overlay" id="article-modal">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3 id="modal-title" style="font-size:1.2rem; font-weight:800;">Edit Article</h3>
-                <button onclick="closeModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-id">
-                
-                <div class="form-group">
-                    <label>Article Title</label>
-                    <input type="text" id="edit-title" required>
+            <form onsubmit="handleInlineAdminLogin(event)">
+                <div style="margin-bottom:14px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Admin Email</label>
+                    <input type="email" id="inlineAdminEmail" value="j.parganiha@gmail.com" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>URL Slug</label>
-                        <input type="text" id="edit-slug" placeholder="auto-generated-if-blank">
-                    </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="edit-category">
-                            <option value="AI">AI</option>
-                            <option value="Startups & Funding">Startups & Funding</option>
-                            <option value="Crypto & Web3">Crypto & Web3</option>
-                            <option value="Cybersecurity">Cybersecurity</option>
-                            <option value="Gadgets & Hardware">Gadgets & Hardware</option>
-                            <option value="Software & Dev">Software & Dev</option>
-                            <option value="Business & Finance">Business & Finance</option>
-                            <option value="Technology">Technology</option>
-                            <option value="India News">India News</option>
-                        </select>
-                    </div>
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Password</label>
+                    <input type="password" id="inlineAdminPassword" placeholder="••••••••" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="edit-status">
-                            <option value="published">Published</option>
-                            <option value="draft">Draft</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Author</label>
-                        <input type="text" id="edit-author" value="DigitalBrief Editorial Desk">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Excerpt / Summary</label>
-                    <textarea id="edit-excerpt" rows="2"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Article HTML Content</label>
-                    <textarea id="edit-content" rows="10" style="font-family:monospace; font-size:0.85rem;"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>SEO Meta Title</label>
-                        <input type="text" id="edit-seo-title">
-                    </div>
-                    <div class="form-group">
-                        <label>Focus Keyword</label>
-                        <input type="text" id="edit-focus-kw">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Meta Description</label>
-                    <textarea id="edit-meta-desc" rows="2"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Featured Image URL</label>
-                    <input type="text" id="edit-image">
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="saveArticle()">💾 Save Changes</button>
+                <button type="submit" style="width:100%; background:linear-gradient(135deg,#a855f7,#9333ea); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(168,85,247,0.4);">
+                    🔐 Sign In & Launch Admin CMS
+                </button>
+            </form>
+            <div style="margin-top:20px; text-align:center;">
+                <a href="/" style="color:#64748b; text-decoration:none; font-size:0.82rem; font-weight:600;">&larr; Return to DigitalBrief Home</a>
             </div>
         </div>
     </div>
@@ -476,9 +510,14 @@
         let currentArticles = [];
 
         async function loadArticles() {
-            const search = document.getElementById('search-input').value;
-            const status = document.getElementById('status-filter').value;
-            const cat = document.getElementById('category-filter').value;
+            const searchInput = document.getElementById('search-input');
+            const statusFilter = document.getElementById('status-filter');
+            const catFilter = document.getElementById('category-filter');
+            if (!searchInput || !statusFilter || !catFilter) return;
+
+            const search = searchInput.value;
+            const status = statusFilter.value;
+            const cat = catFilter.value;
 
             let url = `/api/articles?limit=100`;
             if (status) url += `&status=${encodeURIComponent(status)}`;
@@ -491,13 +530,19 @@
                 currentArticles = data.data || [];
 
                 // Stats
-                document.getElementById('stat-total').innerText = data.total || 0;
+                const totalEl = document.getElementById('stat-total');
+                const pubEl = document.getElementById('stat-published');
+                const draftEl = document.getElementById('stat-drafts');
+                if (totalEl) totalEl.innerText = data.total || 0;
+                
                 let pubCount = currentArticles.filter(a => a.status === 'published').length;
-                document.getElementById('stat-published').innerText = pubCount;
-                document.getElementById('stat-drafts').innerText = (data.total || 0) - pubCount;
+                if (pubEl) pubEl.innerText = pubCount;
+                if (draftEl) draftEl.innerText = (data.total || 0) - pubCount;
 
                 // Render Table
                 const tbody = document.getElementById('articles-tbody');
+                if (!tbody) return;
+
                 if (currentArticles.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-muted);">No articles found.</td></tr>`;
                     return;
@@ -594,14 +639,12 @@
             try {
                 let res;
                 if (id) {
-                    // Update
                     res = await fetch(`/api/articles/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
                 } else {
-                    // Create
                     res = await fetch(`/api/articles`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -636,43 +679,26 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                if (!window.isAdminUser || !window.isAdminUser()) {
-                    document.body.innerHTML = `
-                        <div style="min-height:100vh; background:#050811; display:flex; align-items:center; justify-content:center; font-family:'Plus Jakarta Sans', system-ui, sans-serif; padding:20px;">
-                            <div style="background:#0e131f; border:1px solid #a855f7; border-radius:20px; padding:36px; max-width:440px; width:100%; box-shadow:0 25px 60px rgba(0,0,0,0.9); position:relative;">
-                                <div style="width:56px; height:56px; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 16px auto; color:#c084fc;">👑</div>
-                                <h1 style="color:#fff; font-size:1.5rem; font-weight:800; text-align:center; margin-bottom:6px;">Super Admin CMS Portal</h1>
-                                <p style="color:#cbd5e1; font-size:0.88rem; text-align:center; line-height:1.5; margin-bottom:24px;">
-                                    Restricted Content Management Access for Site Administrator (<code>j.parganiha@gmail.com</code>).
-                                </p>
+        function checkAdminState() {
+            const cmsLayout = document.getElementById('adminCMSLayout');
+            const loginLayout = document.getElementById('adminLoginLayout');
+            if (!cmsLayout || !loginLayout) return;
 
-                                <div id="adminInlineAlert" style="display:none; padding:10px 14px; border-radius:10px; font-size:0.85rem; margin-bottom:16px;"></div>
-
-                                <form onsubmit="handleInlineAdminLogin(event)">
-                                    <div style="margin-bottom:14px;">
-                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Admin Email</label>
-                                        <input type="email" id="inlineAdminEmail" value="j.parganiha@gmail.com" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
-                                    </div>
-                                    <div style="margin-bottom:20px;">
-                                        <label style="display:block; font-size:0.8rem; font-weight:700; color:#cbd5e1; margin-bottom:6px;">Password</label>
-                                        <input type="password" id="inlineAdminPassword" placeholder="••••••••" required style="width:100%; padding:11px 14px; border-radius:10px; border:1px solid #1e293b; background:#050811; color:#fff; font-size:0.9rem; outline:none;">
-                                    </div>
-                                    <button type="submit" style="width:100%; background:linear-gradient(135deg,#a855f7,#9333ea); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:800; font-size:0.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(168,85,247,0.4);">
-                                        🔐 Sign In & Launch Admin CMS
-                                    </button>
-                                </form>
-                                <div style="margin-top:20px; text-align:center;">
-                                    <a href="/" style="color:#64748b; text-decoration:none; font-size:0.82rem; font-weight:600;">&larr; Return to DigitalBrief Home</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    return;
-                }
+            if (window.isAdminUser && window.isAdminUser()) {
+                loginLayout.style.display = 'none';
+                cmsLayout.style.display = 'block';
                 loadArticles();
-            }, 400);
+            } else {
+                cmsLayout.style.display = 'none';
+                loginLayout.style.display = 'flex';
+            }
+        }
+
+        window.addEventListener('digitalbrief:authready', checkAdminState);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminState();
+            setTimeout(checkAdminState, 300);
         });
 
         async function handleInlineAdminLogin(e) {
@@ -686,8 +712,12 @@
             alertBox.style.color = '#c084fc';
             alertBox.innerText = 'Authenticating Super Admin...';
 
-            if (window.supabase) {
-                const client = window.supabase.createClient("https://wlfxoemctfxnoahyardf.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k");
+            let client = window.getSupabaseClient ? window.getSupabaseClient() : null;
+            if (!client && window.supabase) {
+                client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+
+            if (client) {
                 let res = await client.auth.signInWithPassword({ email, password });
                 
                 if (res.error && email.toLowerCase() === 'j.parganiha@gmail.com') {
@@ -707,9 +737,17 @@
                 alertBox.style.background = 'rgba(16,185,129,0.2)';
                 alertBox.style.color = '#34d399';
                 alertBox.innerText = '👑 Super Admin Authenticated! Loading CMS...';
-                setTimeout(() => window.location.reload(), 600);
+
+                setTimeout(() => {
+                    checkAdminState();
+                }, 400);
+            } else {
+                alertBox.style.background = 'rgba(239,68,68,0.2)';
+                alertBox.style.color = '#f87171';
+                alertBox.innerText = 'Supabase Auth Engine unavailable.';
             }
         }
     </script>
 </body>
 </html>
+
