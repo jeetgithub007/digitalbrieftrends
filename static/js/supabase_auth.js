@@ -2,8 +2,8 @@
 // DIGITALBRIEF SUPABASE AUTHENTICATION & ROLE-BASED ACCESS CONTROL ENGINE
 // High-Tech Magazine UI Edition
 // ============================================================================
-const SUPABASE_URL = window.SUPABASE_URL || "https://wlfxoemctfxnoahyardf.supabase.co";
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsZnhvZW1jdGZ4bm9haHlhcmRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MzU5MjcsImV4cCI6MjEwNjQxMTkyN30.HThihr1fP264vZqYwwbkQlvLOVGibWfD5yv3DUg5_8k";
+const SUPABASE_URL = window.SUPABASE_URL || "https://vehxbphzorgaomzrbizc.supabase.co";
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZlaHhicGh6b3JnYW9tenJiaXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMDc4NDEsImV4cCI6MjEwNjQxMTkyN30.mKeoUK24H__I0VVSsMDIQpq6WEYkiElRJdwzVJFxsqA";
 
 let supabaseClient = null;
 let currentUser = null;
@@ -261,6 +261,48 @@ function closeSubscriberModal() {
     if (modal) modal.style.display = 'none';
 }
 
+// Display High-Tech Super Admin Only Modal
+function showAdminOnlyModal(featureName) {
+    let modal = document.getElementById('adminOnlyAccessModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'adminOnlyAccessModal';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:9999999; background:rgba(4,6,14,0.88); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:center; padding:20px;';
+        document.body.appendChild(modal);
+    }
+
+    const featureTitle = featureName || 'Article Generation Engine';
+    const userEmailText = currentUser ? `Logged in as: <strong>${currentUser.email}</strong>` : 'Currently browsing as Guest';
+
+    modal.innerHTML = `
+        <div style="background:#0e131f; border:1px solid #a855f7; border-radius:20px; max-width:460px; width:100%; padding:32px; box-shadow:0 25px 60px rgba(0,0,0,0.85); text-align:center; position:relative; font-family:'Plus Jakarta Sans', system-ui, sans-serif;">
+            <button type="button" onclick="closeAdminOnlyModal()" style="position:absolute; top:16px; right:16px; background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer;">✕</button>
+            <div style="width:54px; height:54px; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 16px auto; color:#c084fc;">👑</div>
+            <h3 style="font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:10px;">Super Admin Authorization Required</h3>
+            <p style="color:#cbd5e1; font-size:0.9rem; line-height:1.55; margin-bottom:20px;">
+                <strong>${featureTitle}</strong> is restricted strictly to the <strong>Super Admin</strong> (<code>j.parganiha@gmail.com</code>). Regular subscribers and guest users cannot generate or publish articles.
+            </p>
+            <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:24px; padding:10px; background:rgba(255,255,255,0.04); border-radius:8px;">
+                ${userEmailText}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button type="button" onclick="closeAdminOnlyModal(); openAuthModal('admin');" class="tech-auth-btn tech-auth-btn-admin" style="justify-content:center; padding:12px; font-size:0.92rem;">
+                    👑 Log In as Super Admin
+                </button>
+                <button type="button" onclick="closeAdminOnlyModal()" style="background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid #1e293b; padding:10px; border-radius:10px; font-weight:600; font-size:0.85rem; cursor:pointer;">
+                    Close Notification
+                </button>
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
+
+function closeAdminOnlyModal() {
+    const modal = document.getElementById('adminOnlyAccessModal');
+    if (modal) modal.style.display = 'none';
+}
+
 let authMode = 'login';
 
 // Dedicated User & Super Admin Login Modal
@@ -458,6 +500,8 @@ window.handleAuthSubmit = handleAuthSubmit;
 window.handleSignOut = handleSignOut;
 window.showSubscriberUpgradeModal = showSubscriberUpgradeModal;
 window.closeSubscriberModal = closeSubscriberModal;
+window.showAdminOnlyModal = showAdminOnlyModal;
+window.closeAdminOnlyModal = closeAdminOnlyModal;
 window.checkSubscriberAccess = checkSubscriberAccess;
 window.isAdminUser = isAdminUser;
 window.getSupabaseClient = getSupabaseClient;
