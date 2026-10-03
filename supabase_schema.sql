@@ -142,3 +142,9 @@ BEGIN
     SET role = 'admin', subscription_status = 'active'
     WHERE LOWER(email) = 'j.parganiha@gmail.com';
 END $$;
+
+-- 8. GRANT ACCESS PERMISSIONS TO SUPABASE ROLES
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+
